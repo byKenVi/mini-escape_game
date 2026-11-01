@@ -49,7 +49,7 @@
 
   /* ---------- état ---------- */
   let session = load('ebib_session', null);
-  let state = null, recv = 0, online = false, fails = 0, busy = false;
+  let state = null, recv = 0, online = false, fails = 0, busy = false, leaving = false;
   let homeError = '', lastHtml = null, lastStepKey = '', lastEventRev = 0;
   let typed = '', wheelTurn = 0, scratch = emptyScratch();
   let nameDraft = load('ebib_name', ''), letterDraft = '', draftFor = '';
@@ -125,6 +125,7 @@
       if (!res.ok) { const err = new Error(json.msg || 'Erreur'); err.code = json.error; throw err; }
       if (session === s) { fails = 0; apply(json); }
     } catch (e) {
+      if (session !== s || leaving) return;
       if (e.code === 'no_room' || e.code === 'forbidden') return dropToHome(e.message);
       fails++;
       render();
@@ -744,8 +745,10 @@
   });
   function leave() {
     confirmQuit = false;
+    leaving = true;
+    clearTimeout(pollT);
     act({ t: 'leave' });
-    enqueue(async () => dropToHome(''));
+    enqueue(async () => { dropToHome(''); leaving = false; });
   }
 
   $app.addEventListener('input', (e) => {
