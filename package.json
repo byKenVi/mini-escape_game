@@ -1,0 +1,12 @@
+{
+  "name": "bibliotheque-alexandrine",
+  "version": "2.0.0",
+  "description": "Escape room coopératif à deux, asymétrique, à jouer en appel",
+  "private": true,
+  "main": "dev-server.js",
+  "scripts": {
+    "start": "node dev-server.js",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=18" }
+}
