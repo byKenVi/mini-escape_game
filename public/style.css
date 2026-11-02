@@ -8,7 +8,7 @@
   --display:'Cinzel','Cormorant Garamond',Georgia,serif;
   --hand:'Petit Formal Script','Cormorant Garamond',Georgia,serif;
   --r:16px;
-  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .22 0 0 0 0 .08 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise:linear-gradient(transparent,transparent);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;background:var(--night);color:var(--paper);font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.42}
@@ -21,7 +21,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var
 
 /* --- décor --- */
 #library,#dust,#candle,#dawn{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
-#library{z-index:0;filter:blur(1.2px) saturate(.9);transition:opacity 2.5s}
+#library{z-index:0;transition:opacity 2.5s}
 #dawn{z-index:0;opacity:0;transition:opacity 3s;background:
   radial-gradient(120% 70% at 50% 108%,#ffd79a 0,#f0a26b 26%,rgba(170,84,84,.85) 55%,transparent 80%),
   linear-gradient(180deg,#1d1730 0,#3d2340 45%,#8b4450 100%)}
@@ -62,12 +62,12 @@ body[data-phase=done] #library,body[data-phase=done] #candle{opacity:0;animation
 /* --- cartes --- */
 .card{background:linear-gradient(180deg,rgba(58,38,25,.88),rgba(28,18,12,.93));border:1px solid rgba(217,164,65,.3);border-radius:var(--r);padding:22px;box-shadow:0 22px 56px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06)}
 .parchment{position:relative;isolation:isolate;color:var(--ink)}
-.parchment::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:8px;background:var(--noise),radial-gradient(120% 90% at 50% 40%,#f5e8cb 0,#ead6ab 62%,#cdaf78 100%);box-shadow:0 22px 50px rgba(0,0,0,.6);filter:url(#deckle)}
+.parchment::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--noise),radial-gradient(120% 90% at 50% 40%,#f5e8cb 0,#ead6ab 62%,#cdaf78 100%);clip-path:polygon(0 .9%,3% 0,7% .7%,12% .2%,18% .9%,24% .3%,31% .8%,38% .1%,45% .7%,52% .2%,59% .9%,66% .3%,73% .7%,80% .1%,87% .8%,93% .2%,97% .7%,100% .3%,99.5% 6%,100% 13%,99.4% 21%,99.9% 29%,99.5% 37%,100% 45%,99.4% 53%,99.9% 61%,99.5% 69%,100% 77%,99.4% 85%,99.9% 93%,99.6% 99.3%,96% 100%,90% 99.3%,84% 99.9%,77% 99.2%,70% 99.8%,63% 99.3%,56% 100%,49% 99.2%,42% 99.8%,35% 99.3%,28% 99.9%,21% 99.2%,14% 99.8%,8% 99.3%,3% 100%,.4% 99.4%,.1% 93%,.6% 85%,0 77%,.5% 69%,.1% 61%,.6% 53%,0 45%,.5% 37%,.1% 29%,.6% 21%,0 13%,.5% 6%)}
 
 /* --- accueil --- */
 .home{text-align:center;padding-top:6vh;display:grid;gap:0;justify-items:center}
 .crest{width:84px;height:84px;margin:0 auto 12px;color:var(--gold);filter:drop-shadow(0 0 18px rgba(217,164,65,.55));animation:glow 4s ease-in-out infinite}
-@keyframes glow{50%{filter:drop-shadow(0 0 30px rgba(243,207,122,.85))}}
+@keyframes glow{50%{opacity:.72}}
 .home h1{margin-top:10px;font-size:clamp(33px,7vw,60px);line-height:1.08;background:linear-gradient(180deg,#fff4d0,#e2b050 62%,#a8741f);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 14px rgba(0,0,0,.8))}
 .home .tag{font-style:italic;font-size:clamp(20px,3.4vw,25px);margin:18px auto 28px;max-width:560px;text-shadow:0 2px 10px #000}
 .entry{width:min(100%,440px);display:grid;gap:14px}
@@ -104,7 +104,7 @@ body[data-phase=done] #library,body[data-phase=done] #candle{opacity:0;animation
 .field::placeholder{color:rgba(241,227,197,.5);font-style:italic}
 
 /* --- prologue --- */
-.modal{position:fixed;inset:0;z-index:50;overflow-y:auto;display:grid;place-items:center;padding:18px;background:rgba(5,3,2,.84);backdrop-filter:blur(5px);animation:fade .35s ease both}
+.modal{position:fixed;inset:0;z-index:50;overflow-y:auto;display:grid;place-items:center;padding:18px;background:rgba(5,3,2,.9);animation:fade .35s ease both}
 @keyframes fade{from{opacity:0}}
 .sheet{width:min(100%,560px);display:grid;gap:15px;text-align:center;animation:pop .55s cubic-bezier(.2,1.2,.4,1) both}
 @keyframes pop{from{transform:scale(.9) translateY(18px);opacity:0}}
@@ -351,10 +351,13 @@ body[data-phase=done] #library,body[data-phase=done] #candle{opacity:0;animation
 .flyer small{display:block;font-family:var(--display);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6b1d1d;margin-bottom:4px}
 .flyer.love{background:var(--noise),linear-gradient(170deg,#fbe6e0,#ecbdb5)}
 @keyframes fly{0%{opacity:0;transform:translateY(-90px) rotate(calc(var(--tilt) - 12deg)) scale(.85)}12%,82%{opacity:1;transform:rotate(var(--tilt))}100%{opacity:0;transform:translateY(46px) rotate(calc(var(--tilt) + 4deg))}}
-.floatheart{position:absolute;bottom:-40px;width:32px;height:32px;color:#ef7c86;transform:scale(var(--s));animation:floatUp 3.2s ease-in both;filter:drop-shadow(0 3px 7px rgba(0,0,0,.5))}
+.floatheart{position:absolute;bottom:-40px;width:32px;height:32px;color:#ef7c86;transform:scale(var(--s));animation:floatUp 3.2s ease-in both}
 .floatheart svg{display:block;width:100%;height:100%}
 @keyframes floatUp{0%{opacity:0}10%{opacity:1}100%{opacity:0;translate:0 -92vh;rotate:16deg}}
 
+@media (pointer:coarse){
+  #candle{animation:none}
+}
 @media (max-width:560px){
   html,body{font-size:19px}
   #app{padding-left:12px;padding-right:12px}

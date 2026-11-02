@@ -55,7 +55,7 @@
   let nameDraft = load('ebib_name', ''), letterDraft = '', draftFor = '';
   let reveal = null, notesOpen = false, teaseOpen = false, hintArmed = false, envelopeOpen = false, confirmQuit = false;
   let introSeen = false, ambienceOn = load('ebib_ambience', false);
-  let audioCtx = null, ambience = null;
+  let audioCtx = null, ambience = null, whiteNoise = null;
   let profileT, hintT, toastT, pollT;
 
   function load(key, fallback) { try { const v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; } }
@@ -226,10 +226,11 @@
     const c = ac(); if (!c) return;
     const t = c.currentTime + (when || 0);
     const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
-    s.buffer = noiseBuffer(c, Math.max(dur, 0.05), false);
+    whiteNoise = whiteNoise || noiseBuffer(c, 3, false);
+    s.buffer = whiteNoise;
     f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
     g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    s.connect(f); f.connect(g); g.connect(c.destination); s.start(t);
+    s.connect(f); f.connect(g); g.connect(c.destination); s.start(t, 0, dur + 0.02);
   }
   function playNote(level) {
     const f = { 1: 261.63, 2: 329.63, 3: 392.0, 4: 523.25 }[level];
@@ -316,7 +317,7 @@
       <ol class="how">
         <li><b>Appelez-vous</b>L’appel, c’est votre seul moyen de jouer. Sans lui, personne ne sort.</li>
         <li><b>Parlez</b>Vous ne voyez jamais la même chose. Il faut décrire, écouter, et assumer ses erreurs.</li>
-        <li><b>Retrouvez les lettres</b>Sept chapitres, environ 45 minutes, et une histoire d’amour à reconstituer.</li>
+        <li><b>Retrouvez les lettres</b>Sept chapitres, une bonne heure de jeu, et une histoire d’amour à reconstituer.</li>
       </ol>
     </main>`;
   }
@@ -484,7 +485,7 @@
         <circle cx="${C}" cy="${C}" r="7" fill="#d9a441"/>
       </svg></div>
       <div class="wctl"><button class="iconbtn large" data-act="wl" aria-label="Tourner vers la gauche">◀</button><b>Cran ${shown}</b><button class="iconbtn large" data-act="wr" aria-label="Tourner vers la droite">▶</button></div>
-      <p class="legend">Anneau extérieur : la lettre codée. Juste en dessous, sur l’anneau sombre : la vraie lettre.</p>`;
+      <p class="legend">Anneau doré : la lettre codée. Juste en dessous, sur l’anneau sombre : la vraie lettre. Tourne cran par cran : dès que les premières lettres forment un début de mot, tu tiens le bon réglage.</p>`;
   }
 
   function staff(v) {
@@ -817,6 +818,8 @@
         plank.addColorStop(0, '#49301d'); plank.addColorStop(0.3, '#2f1e12'); plank.addColorStop(1, '#120b06');
         cx.fillStyle = plank; cx.fillRect(0, base, W, 14);
       }
+      // Flou peint une seule fois dans l'image : un filtre CSS se recalculerait à chaque image.
+      if ('filter' in cx) { cx.filter = 'blur(1.2px) saturate(.9)'; cx.drawImage(cv, 0, 0); cx.filter = 'none'; }
     }
     paint(); addEventListener('resize', paint);
   })();
@@ -842,8 +845,10 @@
     }
     size(); addEventListener('resize', size);
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    (function tick() {
-      if (!document.hidden) {
+    let lastFrame = 0;
+    (function tick(now) {
+      if (!document.hidden && now - lastFrame >= 40) {
+        lastFrame = now;
         cx.clearRect(0, 0, W, H);
         for (const p of parts) {
           p.x += p.vx + Math.sin(p.p += 0.01) * 0.15; p.y += p.vy;
@@ -852,7 +857,20 @@
         }
       }
       requestAnimationFrame(tick);
-    })();
+    })(0);
+  })();
+
+  // Grain du papier : une petite image calculée une fois, répétée par le CSS.
+  (function paperGrain() {
+    const size = 128, cv = document.createElement('canvas');
+    cv.width = cv.height = size;
+    const cx = cv.getContext('2d'), img = cx.createImageData(size, size);
+    for (let i = 0; i < img.data.length; i += 4) {
+      img.data[i] = 90; img.data[i + 1] = 56; img.data[i + 2] = 20;
+      img.data[i + 3] = Math.random() * 34;
+    }
+    cx.putImageData(img, 0, 0);
+    document.documentElement.style.setProperty('--noise', `url(${cv.toDataURL()})`);
   })();
 
   /* ---------- démarrage ---------- */
