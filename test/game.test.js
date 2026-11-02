@@ -239,6 +239,14 @@ test('tome II : partie complète, le chrono s’arrête pendant les entractes', 
   assert.strictEqual(G.snapshot(room, 'B').finalWord, 'RESTER');
 });
 
+test('tome II : si la reprise se perd, la première action relance le chrono', () => {
+  const room = startedTrain(false, false);
+  tick(room, 'A', { t: 'submit', answer: room.puzzles[0].answer });
+  assert.ok(room.pausedAt > 0);
+  tick(room, 'B', { t: 'hint' });
+  assert.strictEqual(room.pausedAt, 0);
+});
+
 test('aucune réponse du tome II dans ce que reçoit un joueur', () => {
   const room = startedTrain(false, false);
   for (let i = 0; i < room.puzzles.length; i++) {
