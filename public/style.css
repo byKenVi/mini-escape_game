@@ -23,8 +23,8 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var
 #library,#dust,#candle,#dawn{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
 #library{z-index:0;transition:opacity 2.5s}
 #dawn{z-index:0;opacity:0;transition:opacity 3s;background:
-  radial-gradient(120% 70% at 50% 108%,#ffd79a 0,#f0a26b 26%,rgba(170,84,84,.85) 55%,transparent 80%),
-  linear-gradient(180deg,#1d1730 0,#3d2340 45%,#8b4450 100%)}
+  radial-gradient(130% 34% at 50% 106%,#f0a26b 0,rgba(176,84,72,.8) 55%,transparent 100%),
+  linear-gradient(180deg,#1d1730 0,#35203c 50%,#5e2d40 100%)}
 #candle{--cx:50%;--cy:30%;z-index:1;background:radial-gradient(circle at var(--cx) var(--cy),rgba(255,176,86,.13) 0,rgba(16,9,5,.5) 26%,rgba(10,6,4,.9) 62%,rgba(6,4,2,.97) 100%);animation:flicker 5s infinite;transition:opacity 2.5s}
 @keyframes flicker{0%,100%{opacity:1}12%{opacity:.95}18%{opacity:.99}37%{opacity:.93}52%{opacity:.98}71%{opacity:.94}86%{opacity:.99}}
 #dust{z-index:2}
@@ -77,7 +77,8 @@ body[data-phase=done] #library,body[data-phase=done] #candle{opacity:0;animation
 .codeinput{min-width:0;width:100%;text-align:center;font-family:var(--display);font-size:22px;letter-spacing:.3em;padding:8px 6px 8px calc(6px + .3em);background:rgba(0,0,0,.42);border:1px solid rgba(241,227,197,.32);border-radius:12px;color:var(--gold2);text-transform:uppercase}
 .codeinput::placeholder{color:rgba(241,227,197,.42)}
 .codeinput:focus,.field:focus{outline:2px solid var(--gold);outline-offset:1px}
-.err{color:var(--bad);min-height:1.3em;font-size:17px;margin-top:-4px}
+.err{color:var(--bad);font-size:17px;margin-top:-4px}
+.err:empty{display:none}
 .how{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:26px 0 0;width:100%;text-align:left;counter-reset:s}
 .how li{counter-increment:s;background:rgba(15,9,5,.72);border:1px solid rgba(241,227,197,.16);border-radius:14px;padding:14px 16px;font-size:18px}
 .how b{display:block;font-family:var(--display);font-size:13px;letter-spacing:.12em;color:var(--gold2);margin-bottom:5px;text-transform:uppercase}
@@ -145,7 +146,7 @@ body[data-phase=done] #library,body[data-phase=done] #candle{opacity:0;animation
 .brief .them span{display:block}
 .brief .them span::first-letter{text-transform:uppercase}
 .panel{padding:22px;border-radius:12px}
-.panel.parchment::before{bottom:44px}
+.panel.parchment:has(.answerbox)::before{bottom:44px}
 .panel.dark{background:linear-gradient(180deg,#2d2118,#17100a);border:1px solid rgba(217,164,65,.32);box-shadow:0 22px 50px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06)}
 
 /* reliures */
@@ -377,5 +378,173 @@ body[data-phase=done] #library,body[data-phase=done] #candle{opacity:0;animation
   .dgt{height:40px;font-size:17px}
 }
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01s!important;animation-delay:0s!important;transition:none!important}
+  *,*::before,*::after{animation-duration:.01s!important;animation-delay:0s!important;animation-iteration-count:1!important;transition:none!important}
+}
+
+/* ---------- accueil : le choix du tome ---------- */
+.tomes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;width:100%;margin-bottom:16px}
+.tomecard{display:grid;gap:5px;text-align:left;padding:20px 20px 18px;border-radius:14px;font-family:var(--serif);font-size:18px;font-weight:500;line-height:1.28;color:var(--paper);border:1px solid rgba(217,164,65,.42);background:linear-gradient(170deg,rgba(62,40,24,.96),rgba(24,15,9,.97));box-shadow:0 18px 44px rgba(0,0,0,.6);transition:transform .16s,border-color .16s}
+.tomecard:hover:not([disabled]){transform:translateY(-3px);border-color:var(--gold2)}
+.tomecard[disabled]{opacity:.55;cursor:progress}
+.tomecard .tomeno{font-family:var(--display);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.tomecard b{font-family:var(--display);font-size:24px;line-height:1.1;color:#fff0cc}
+.tomecard .tomewhere{font-style:italic;color:var(--gold2)}
+.tomecard.t2{background:linear-gradient(170deg,#1b2a5e,#0a1030);border-color:rgba(214,178,106,.6)}
+.tomecard.t2 .tomeno,.tomecard.t2 .tomewhere{font-family:'Josefin Sans',sans-serif;color:#e5c684}
+.tomecard.t2 b{font-family:'Limelight',serif;font-weight:400;letter-spacing:.02em;color:#f6e8c6}
+.tomecard.t2 .tomedesc{font-family:'Spectral',Georgia,serif;font-size:16px}
+.lobbytome{font-family:var(--display);font-size:15px;letter-spacing:.06em;color:var(--gold2)}
+.spicy{display:grid!important;grid-template-columns:auto 1fr;gap:12px;align-items:start;margin-top:14px!important;padding:12px;border-radius:10px;border:1px solid rgba(227,139,146,.42);background:rgba(120,40,56,.2);font-family:var(--serif)!important;font-size:17px!important;letter-spacing:0!important;color:var(--paper)!important;line-height:1.28;cursor:pointer}
+.spicy input{width:24px;height:24px;margin:2px 0 0;accent-color:#c8505c}
+.spicy span{font-size:17px!important;opacity:1!important;font-style:normal!important;color:var(--paper)!important}
+.spicy b{display:block;font-family:var(--display);font-size:14px;letter-spacing:.05em;color:#ffc9cd;margin-bottom:2px}
+
+/* ---------- cartes : temps du minuteur et question profonde ---------- */
+.darecard.deep{background:linear-gradient(180deg,#1f2340,#0f1124);border-color:rgba(170,180,230,.42)}
+.darecard.deep .eyebrow{color:#b9c2f0}
+.cardtimer{display:grid;justify-items:center;gap:0}
+.cardtimer b{font-family:var(--display);font-size:50px;line-height:1;color:var(--gold2);font-variant-numeric:tabular-nums}
+.cardtimer span{font-size:16px;opacity:.8}
+
+/* ---------- énigmes du tome II ---------- */
+.board{display:grid;gap:3px;border-radius:8px;padding:8px;background:#04060f;border:2px solid #57472a;box-shadow:inset 0 0 22px #000}
+.boardrow{display:grid;grid-template-columns:3.6em 1fr 4.2em 3em;gap:6px;align-items:center;text-align:left;padding:9px 8px;width:100%;border:0;border-radius:4px;background:#101630;font-family:'Special Elite','Courier New',monospace;font-size:clamp(14px,3.9vw,18px);color:#f2c95e;position:relative}
+.boardrow.head{background:none;color:#a59a7c;font-family:'Josefin Sans',sans-serif;font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px}
+.boardrow.out{color:#67604a}
+.boardrow.out:after{content:"";position:absolute;left:6px;right:6px;top:50%;height:1.5px;background:#c8505c}
+.stub{border-left:3px dashed rgba(70,40,15,.5);padding-left:14px}
+.stubhead{font-family:'Special Elite','Courier New',monospace;font-size:15px;color:#7a3b12;margin-bottom:10px}
+.stubhead span{letter-spacing:1px}
+.stublist{list-style:none;margin:0;padding:0;display:grid;gap:9px;font-family:'Special Elite','Courier New',monospace;font-size:clamp(15px,4vw,18px);line-height:1.32}
+.stublist li{padding-bottom:8px;border-bottom:1px dotted rgba(70,40,15,.45)}
+.lampbox{display:grid;justify-items:center;gap:16px;padding:4px 0}
+.lantern{position:relative;width:96px;height:132px;border-radius:12px 12px 6px 6px;border:5px solid #8c6a2a;background:#0d1020;box-shadow:inset 0 0 18px #000;transition:background .06s,box-shadow .06s}
+.lantern:before{content:"";position:absolute;left:50%;top:-20px;width:36px;height:16px;margin-left:-18px;border:4px solid #8c6a2a;border-bottom:0;border-radius:18px 18px 0 0}
+.lantern i{position:absolute;inset:18px;border-radius:50%;background:#1d2138}
+.lantern.lit{background:#ffe9a8;box-shadow:0 0 60px 20px rgba(255,214,120,.7)}
+.lantern.lit i{background:#fffbe0}
+.chart{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:5px}
+.chartcell{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px;border-radius:5px;background:rgba(255,250,235,.55);font-family:'Special Elite','Courier New',monospace}
+.chartcell b{font-size:17px}
+.chartcell span{font-size:13px;letter-spacing:1px;color:#6b1d1d;white-space:nowrap}
+.parchment .chart+.legend{margin-top:8px}
+.maze{max-width:380px;margin:0 auto}
+.maze svg{display:block;width:100%;height:auto}
+.mzwall{fill:none;stroke:#2b1a0c;stroke-width:5;stroke-linecap:round}
+.mzgrid{stroke:rgba(214,178,106,.2);stroke-width:1;fill:none}
+.mz{font-family:'Josefin Sans',sans-serif;font-size:16px;font-weight:700;text-anchor:middle;fill:#7a3b12}
+.maze.dark .mz{fill:#d6b26a}
+.mzmark{font-family:'Josefin Sans',sans-serif;font-size:22px;font-weight:700;text-anchor:middle;fill:#7a3b12}
+.maze.dark .mzmark{fill:rgba(214,178,106,.65)}
+.mzmark.goal{fill:#a52c17}
+.maze.dark .mzmark.goal{fill:#ff9d8c}
+.mztoken{fill:#f6d680;stroke:#fff6d8;stroke-width:2;transition:transform .2s ease}
+.mzpos{text-align:center;margin:10px 0}
+.mzpos b{color:var(--gold2)}
+.pad{display:grid;grid-template-columns:repeat(3,70px);grid-template-rows:repeat(3,62px);gap:6px;justify-content:center;grid-template-areas:". n ." "w . e" ". s ."}
+.padbtn{border-radius:12px;border:1px solid rgba(214,178,106,.6);background:linear-gradient(180deg,#2a3a72,#141d44);color:#f6e8c6;font-size:20px;touch-action:manipulation;padding:0}
+.padbtn:active{transform:scale(.94)}
+.padbtn.N{grid-area:n}.padbtn.W{grid-area:w}.padbtn.E{grid-area:e}.padbtn.S{grid-area:s}
+.quiz{display:grid;gap:16px;text-align:center}
+.qscore{display:flex;justify-content:space-between;gap:10px;font-family:'Josefin Sans',sans-serif;font-size:14px;color:#e5c684}
+.question{font-size:clamp(25px,6vw,34px);line-height:1.18;font-style:italic;color:#f6e8c6}
+.qbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qbtns .btn{min-width:0;overflow-wrap:anywhere;padding:12px 8px}
+.qwait{font-size:19px}
+.qlast{display:grid;gap:2px;padding:10px 12px;border-radius:9px;font-size:17px;line-height:1.26;background:rgba(255,255,255,.05);text-align:left}
+.qlast b{font-family:'Josefin Sans',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.qlast.yes b{color:var(--ok)}.qlast.no b{color:var(--bad)}
+.mirror{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:340px;margin:0 auto;padding:12px;border-radius:10px;background:linear-gradient(135deg,rgba(150,180,235,.1),rgba(20,30,70,.3));border:2px solid rgba(214,178,106,.42)}
+.mirhead{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center;font-family:'Josefin Sans',sans-serif;font-size:14px;color:#e5c684}
+.pane{aspect-ratio:1;display:block;width:100%;padding:0;border-radius:5px;border:1px solid rgba(214,178,106,.42);background:rgba(4,7,20,.8);touch-action:manipulation}
+.pane.lit{background:linear-gradient(135deg,#ffdf94,#d0883a);box-shadow:0 0 12px rgba(255,200,110,.55)}
+.timeline{display:grid;gap:0}
+.tl{display:flex;justify-content:space-between;gap:12px;padding:10px 4px;border-bottom:1px dotted rgba(70,40,15,.5);font-family:'Special Elite','Courier New',monospace;font-size:clamp(15px,4vw,18px)}
+.tl b{font-weight:400}
+.tl.start{font-size:clamp(17px,4.6vw,20px);color:#7a1f12}
+
+/* ---------- Tome II : la direction artistique Art déco ---------- */
+#scene{position:fixed;inset:0;z-index:0;overflow:hidden;background:#060a1e;display:none;pointer-events:none}
+.sky{position:absolute;left:0;top:0;width:100%;height:62%}
+.strip{position:absolute;left:0;width:calc(100% + var(--tile));background-repeat:repeat-x;background-position:0 0;will-change:transform}
+.strip.far{bottom:calc(38% - 6px);animation:slide 150s linear infinite}
+.strip.mid{bottom:calc(38% - 6px);animation:slide 72s linear infinite}
+.strip.near{bottom:calc(38% - 6px);animation:slide 16s linear infinite}
+@keyframes slide{to{transform:translate3d(calc(var(--tile)*-1),0,0)}}
+.trainframe{position:absolute;left:0;right:0;bottom:0;height:38%;background:linear-gradient(180deg,#1a1224 0,#0c0a18 16%,#080712 100%);border-top:7px solid #8c6a2a;box-shadow:0 -2px 0 #4f3a14,0 -14px 34px rgba(0,0,0,.6)}
+body[data-volume="2"]{
+  --night:#080c20; --wood:#141d44; --wood2:#1b2a5e;
+  --paper:#f4ecd8; --paper2:#e2d4b0; --ink:#161a30; --ink-soft:#49506f;
+  --gold:#d6b26a; --gold2:#f0d999; --wax:#8c6a2a; --wax2:#e3c078; --rose:#e38b92;
+  --line:rgba(214,178,106,.28);
+  --serif:'Spectral',Georgia,'Times New Roman',serif;
+  --display:'Josefin Sans','Trebuchet MS',sans-serif;
+  --hand:'Special Elite','Courier New',monospace;
+  --r:6px;
+  font-size:18px;
+  font-weight:400;
+  background:#080c20;
+}
+body[data-volume="2"] .spicy span{font-weight:400}
+body[data-volume="2"] .done h1{text-wrap:balance}
+body[data-volume="2"] #scene{display:block}
+body[data-volume="2"] #library,body[data-volume="2"] #dust{display:none}
+body[data-volume="2"] #candle{animation:none;background:linear-gradient(180deg,rgba(6,9,26,.42) 0,rgba(6,9,26,.62) 34%,rgba(6,8,22,.86) 100%)}
+body[data-volume="2"] .ptitle{font-family:'Limelight',serif;font-weight:400;letter-spacing:.02em;color:#f6e8c6}
+body[data-volume="2"] .eyebrow{letter-spacing:.18em;font-weight:600}
+body[data-volume="2"] .pstory{font-size:19px}
+body[data-volume="2"] .btn{border-radius:3px;background:linear-gradient(180deg,#ecd395,#b48d42);border-color:#f3dfa8;letter-spacing:.1em;font-size:14px;text-transform:uppercase}
+body[data-volume="2"] .btn.ghost{background:rgba(255,255,255,.05);border-color:rgba(214,178,106,.55);color:#f4ecd8}
+body[data-volume="2"] .btn.ghost.ink{background:rgba(22,26,48,.08);border-color:rgba(22,26,48,.45);color:#161a30}
+body[data-volume="2"] .card,body[data-volume="2"] .pl,body[data-volume="2"] .brief>div,body[data-volume="2"] .hint{background:rgba(9,14,38,.9);border-radius:4px;box-shadow:none}
+body[data-volume="2"] .card{border:1px solid rgba(214,178,106,.42);outline:1px solid rgba(214,178,106,.2);outline-offset:3px}
+body[data-volume="2"] .brief b,body[data-volume="2"] .hint b,body[data-volume="2"] .form label{letter-spacing:.08em;font-weight:700;font-size:12px}
+body[data-volume="2"] .roomcode{font-family:'Limelight',serif;letter-spacing:.2em;padding-left:.2em;text-shadow:0 0 22px rgba(240,217,153,.5)}
+body[data-volume="2"] .role{border-radius:2px;background:rgba(9,14,38,.9)}
+body[data-volume="2"] .parchment::before{clip-path:none;border-radius:3px;background:var(--noise),linear-gradient(180deg,#f7efda,#e9dcbb);box-shadow:inset 0 0 0 1px rgba(22,26,48,.45),inset 0 0 0 5px #f7efda,inset 0 0 0 6px rgba(140,106,42,.65)}
+body[data-volume="2"] .panel.parchment{padding:24px}
+body[data-volume="2"] .panel.parchment:has(.answerbox)::before{bottom:44px}
+body[data-volume="2"] .panel.dark{background:linear-gradient(180deg,#141d44,#090e26);border-radius:3px;border:1px solid rgba(214,178,106,.42);box-shadow:0 20px 44px rgba(0,0,0,.6)}
+body[data-volume="2"] .answerbox{background:linear-gradient(180deg,#141d44,#090e26);border-top:1px solid rgba(214,178,106,.6);border-radius:0 0 3px 3px}
+body[data-volume="2"] .slot{border-radius:2px;font-family:'Special Elite','Courier New',monospace;background:#04060f;border-color:rgba(214,178,106,.55)}
+body[data-volume="2"] .alabel{letter-spacing:.06em;font-weight:600;font-size:13px}
+body[data-volume="2"] .cluelist li,body[data-volume="2"] .hand{font-weight:400}
+body[data-volume="2"] .hand{font-size:18px;line-height:1.6}
+body[data-volume="2"] .letter .sig{color:#7a1f12;font-size:17px}
+body[data-volume="2"] .seal.on,body[data-volume="2"] .socket.filled,body[data-volume="2"] .bigseal,body[data-volume="2"] .finalword span,body[data-volume="2"] .envelope .wax{border-radius:50%;background:radial-gradient(circle at 35% 28%,#f6e2a8,#a07c34 72%);color:#161a30;box-shadow:0 3px 12px rgba(214,178,106,.5),inset 0 0 0 3px rgba(22,26,48,.22)}
+body[data-volume="2"] .seal sup,body[data-volume="2"] .bigseal sup{background:#161a30;color:#f0d999;box-shadow:0 0 0 1px #d6b26a}
+body[data-volume="2"] .socket{color:#161a30;border-color:rgba(214,178,106,.55)}
+body[data-volume="2"] .socket em{font-family:'Josefin Sans',sans-serif}
+body[data-volume="2"] .riddle{font-family:'Spectral',serif;font-style:italic;font-size:21px}
+body[data-volume="2"] .arch{width:128px;height:176px;border-radius:6px;background:#141d44;border-color:#a98844;box-shadow:0 0 30px rgba(240,217,153,.28)}
+body[data-volume="2"] .arch i{background:linear-gradient(180deg,#223067,#141d44)}
+body[data-volume="2"] .arch .dl:after,body[data-volume="2"] .arch .dr:after{top:48%;height:30px;width:6px;border-radius:3px}
+body[data-volume="2"] .darecard{border-radius:4px;background:linear-gradient(180deg,#3a1630,#170a1c);border-color:rgba(227,139,146,.5)}
+body[data-volume="2"] .darecard.deep{background:linear-gradient(180deg,#16204f,#090e26);border-color:rgba(214,178,106,.5)}
+body[data-volume="2"] .darecard.deep .eyebrow{color:#e5c684}
+body[data-volume="2"] .dare{font-family:'Spectral',serif;font-size:clamp(23px,5vw,29px);line-height:1.26}
+body[data-volume="2"] .dock,body[data-volume="2"] .teasemenu{border-radius:6px;background:rgba(9,14,38,.97);border-color:rgba(214,178,106,.55)}
+body[data-volume="2"] .teasebtn{font-family:'Spectral',serif;font-size:17px;font-weight:500;border-radius:3px}
+body[data-volume="2"] .dockbtn{font-size:11px;font-weight:600;letter-spacing:.06em}
+body[data-volume="2"] #dawn{background:
+  radial-gradient(120% 26% at 50% 104%,#f2b583 0,rgba(190,120,110,.7) 60%,transparent 100%),
+  linear-gradient(180deg,#141a44 0,#2b2a5c 52%,#5a3c6e 100%)}
+body[data-volume="2"] .done h1{font-family:'Limelight',serif;font-weight:400;font-size:clamp(30px,6.4vw,48px)}
+body[data-volume="2"] .done .crest{color:#f0d999}
+body[data-volume="2"] .stat,body[data-volume="2"] .award,body[data-volume="2"] .journal{background:rgba(10,14,40,.72);border-radius:4px;border-color:rgba(240,217,153,.34)}
+body[data-volume="2"] .envelope{border-radius:3px;background:var(--noise),linear-gradient(170deg,#f7efda,#e2d3ac)}
+body[data-volume="2"] .envelope .flap{background:linear-gradient(180deg,#ece0c1,#d8c79c)}
+body[data-volume="2"] .doors{background:radial-gradient(80% 60% at 50% 62%,#fff0cf 0,#f2b583 42%,#2b2a5c 100%)}
+body[data-volume="2"] .leaf{background:linear-gradient(90deg,#141d44,#0a1030);box-shadow:none;border-inline:3px solid #8c6a2a}
+body[data-volume="2"] .leaf.l{transform-origin:0 50%;animation:slideL 2.5s cubic-bezier(.6,0,.3,1) .35s both}
+body[data-volume="2"] .leaf.r{transform-origin:100% 50%;animation:slideR 2.5s cubic-bezier(.6,0,.3,1) .35s both}
+@keyframes slideL{to{transform:translate3d(-100%,0,0)}}
+@keyframes slideR{to{transform:translate3d(100%,0,0)}}
+body[data-volume="2"] .doorword{font-family:'Limelight',serif;font-weight:400;color:#2b2a5c}
+body[data-volume="2"] #toast{border-radius:4px;background:rgba(9,14,38,.98);font-size:17px}
+body[data-volume="2"] .flyer{border-radius:2px;font-size:18px}
+@media (max-width:560px){
+  body[data-volume="2"]{font-size:17px}
+  .tomecard{padding:16px}
+  .tomecard b{font-size:22px}
 }

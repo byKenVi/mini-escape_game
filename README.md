@@ -1,6 +1,9 @@
 # La Bibliothèque d'Alexandrine
 
-Escape game coopératif à deux, à jouer en appel. Chaque joueur voit un écran différent : il faut décrire, écouter, et se taquiner. En chemin, les joueurs retrouvent les lettres qu'Alexandrine et Augustin se sont écrites à distance.
+Escape game coopératif à deux. Chaque joueur voit un écran différent : il faut décrire, écouter, et se taquiner. En chemin, les joueurs retrouvent les lettres qu'Alexandrine et Augustin se sont écrites.
+
+- **Tome I, La Bibliothèque** : à distance, en appel.
+- **Tome II, Le Train de Nuit** : dans la même pièce, dos à dos. Après chaque voiture, une question et un geste. Les gestes osés ne s'activent que si les deux joueurs majeurs disent oui, et chaque carte peut être passée.
 
 ## Lancer en local
     npm start        # http://localhost:3000
@@ -17,7 +20,8 @@ Chaque push sur `main` déploie. Les fonctions Vercel ne gardent rien en mémoir
 Les navigateurs interrogent `/api/game` environ une fois par seconde, ce qui survit aux coupures réseau et aux téléphones mis en veille.
 
 ## Structure
-- `lib/puzzles.js` : les 7 chapitres, les lettres, les entractes (réponses uniquement côté serveur)
+- `lib/puzzles.js` : le tome I, ses 7 chapitres, ses lettres et ses entractes (réponses uniquement côté serveur)
+- `lib/train.js` : le tome II, ses 7 voitures, ses télégrammes et ses cartes
 - `lib/game.js` : les règles, sans réseau ni stockage
 - `lib/store.js` : Redis ou mémoire, écriture optimiste si les deux joueurs agissent en même temps
 - `api/game.js` : l'API appelée par le navigateur
@@ -25,4 +29,7 @@ Les navigateurs interrogent `/api/game` environ une fois par seconde, ce qui sur
 - `public/` : l'interface
 
 ## Ajouter une énigme
-Ajouter une fonction dans `lib/puzzles.js` (vue A, vue B, réponse, indices, lettre), l'ajouter dans `buildAll()`, et si besoin un nouveau `type` de vue dans `viewBody()` de `public/app.js`. Les six premiers chapitres donnent chacun un sceau : garder `SEALS` et `DARES` alignés.
+Ajouter une fonction dans le fichier du tome (vue A, vue B, réponse, indices, lettre), l'ajouter dans `buildAll()`, et si besoin un nouveau `type` de vue dans `viewBody()` de `public/app.js`. Les six premières étapes donnent chacune un sceau : garder `SEALS` et les cartes d'entracte alignés.
+
+## Ajouter un tome
+Créer un fichier qui exporte `buildAll`, `cardsFor`, `SEALS` et `FINAL_WORD`, le déclarer dans `VOLUMES` (`lib/game.js`) et dans `TOMES` (`public/app.js`), puis lui donner son thème sous `body[data-volume="N"]` dans `public/style.css`.

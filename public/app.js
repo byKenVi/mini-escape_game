@@ -32,12 +32,82 @@
     '{name} vient d’inventer un nouveau genre musical. On reprend.',
   ];
 
+  // Ce qui change d'un tome à l'autre, côté interface.
+  const TOMES = {
+    1: {
+      chapter: 'Chapitre', chapterAll: 'Chapitres',
+      prologue: [
+        'Alexandrine gardait la grande bibliothèque. Augustin dessinait des cartes de pays où elle n’irait jamais. Pendant onze ans, ils ont vécu loin l’un de l’autre, et ils se sont écrit.',
+        'Pour que personne d’autre ne lise leurs lettres, elle les a cachées ici, derrière des mécanismes qui ne s’ouvrent qu’à deux voix.',
+        'Ce soir, la porte vient de se refermer derrière vous. Sur le pupitre, un billet encore frais :',
+      ],
+      note: 'Vous êtes deux, vous êtes loin, et vous vous parlez. Parfait, ce sont les seules règles. Sortez d’ici avant l’aube. Et taquinez-vous : chez moi, c’est obligatoire.',
+      rules: (other) => [
+        ['Vos écrans sont différents.', ` Ce que tu vois, ${other} ne le voit pas. Tout passe par la voix.`],
+        ['Un seul de vous deux tape la réponse.', ' Peu importe lequel, le mécanisme s’ouvre pour vous deux.'],
+        ['Les indices sont gratuits.', ' Sauf pour l’honneur : le registre note qui les demande.'],
+      ],
+      enter: 'Entrer dans la bibliothèque',
+      ambience: 'Feu de cheminée',
+      ambienceNote: 'Pour le feu de cheminée, un casque évite que l’autre l’entende dans l’appel.',
+      lobbyHint: 'Envoie le lien, lance l’appel, et attends ici.',
+      invite: 'Une bibliothèque, une porte fermée à clé, et tu es la seule personne qui peut m’en sortir. Appelle-moi et viens :',
+      letterLabel: 'Un mot sous scellé',
+      letterHolder: 'Écris quelque chose à l’autre. Alexandrine le garde sous cire : il ne s’ouvrira qu’une fois la porte franchie.',
+      sealWord: 'sceau', sealsWord: 'sceaux',
+      lastLetter: 'Dernière lettre', foundLetter: 'Lettre retrouvée', leaveBtn: 'Sortir',
+      letterFrom: 'Le mot de', openLabel: 'Briser le sceau',
+      outEyebrow: 'La porte est ouverte', outTitle: 'Dehors, c’est l’aube', outStory: 'Ils se sont revus au printemps. À votre tour.',
+      replay: 'Rejouer, avec de nouveaux codes', shareName: 'la Bibliothèque d’Alexandrine',
+      cardLegend: 'Alexandrine écoute. Elle n’a que ça à faire depuis deux siècles.',
+      registry: 'Le registre d’Alexandrine', rereadLabel: 'Relire toutes leurs lettres',
+    },
+    2: {
+      chapter: 'Voiture', chapterAll: 'Voitures',
+      prologue: [
+        'Il est rentré au printemps. Elle lui a dit qu’il était en retard. Et pour la première fois en onze ans, ils sont partis ensemble : deux billets sur le Nocturne, le train de nuit qui traverse l’Europe.',
+        'Mais Alexandrine n’a jamais rien offert sans le verrouiller. Elle a laissé dans chaque voiture une épreuve pour Augustin. Puis, un soir, elle les a laissées pour d’autres.',
+        'Ce soir, le train part. Sur la banquette, un télégramme vous attend :',
+      ],
+      note: 'Asseyez-vous dos à dos. Ne vous retournez pas, sauf quand une carte vous l’ordonne. Vous avez toute la nuit. Elle passe vite, vous verrez.',
+      rules: (other) => [
+        ['Dos à dos, un téléphone chacun.', ` Ce que tu vois, ${other} ne doit pas le voir. Tout passe par la voix.`],
+        ['Après chaque voiture, deux cartes.', ' Une question, puis un geste. Le chrono s’arrête : prenez votre temps. Chaque carte peut être passée.'],
+        ['Les indices sont gratuits.', ' Sauf pour l’honneur : le contrôleur note qui les demande.'],
+      ],
+      enter: 'Monter à bord',
+      ambience: 'Bruit du train',
+      ambienceNote: 'Un seul téléphone suffit pour le bruit du train : vous êtes dans la même pièce.',
+      lobbyHint: 'Montre ce code à l’autre, ou envoie-lui le lien.',
+      invite: 'Un train de nuit, deux billets, et une place à côté de moi. Viens :',
+      letterLabel: 'Un billet retour',
+      letterHolder: 'Écris quelque chose à l’autre. Le contrôleur le garde sous pli : il ne sera remis qu’à l’arrivée.',
+      sealWord: 'poinçon', sealsWord: 'poinçons',
+      lastLetter: 'Dernier télégramme', foundLetter: 'Télégramme retrouvé', leaveBtn: 'Descendre du train',
+      letterFrom: 'Le billet retour de', openLabel: 'Ouvrir le pli',
+      outEyebrow: 'Terminus', outTitle: 'Le jour se lève sur la mer', outStory: 'Revoir, c’était la promesse. Rester, c’est tous les matins d’après.',
+      replay: 'Reprendre le train, avec de nouveaux codes', shareName: 'le Train de Nuit',
+      cardLegend: 'Le chrono est arrêté. Le train, lui, continue.',
+      registry: 'Le carnet du contrôleur', rereadLabel: 'Relire tous leurs télégrammes',
+    },
+  };
+  const tome = () => TOMES[(state && state.volume) || 1];
+
   const SYM = {
     moon: '<svg viewBox="0 0 48 48"><path d="M30 6a18 18 0 1 0 12 26A15 15 0 0 1 30 6z" fill="currentColor"/></svg>',
     star: '<svg viewBox="0 0 48 48"><path d="M24 3l5 15 15 6-15 6-5 15-5-15-15-6 15-6z" fill="currentColor"/></svg>',
     tower: '<svg viewBox="0 0 48 48"><path fill-rule="evenodd" d="M12 42V18h-2V8h6v4h4V8h8v4h4V8h6v10h-2v24zM20 42v-9a4 4 0 0 1 8 0v9z" fill="currentColor"/></svg>',
     flower: '<svg viewBox="0 0 48 48"><path fill-rule="evenodd" d="M24 4a8 8 0 0 1 8 8 8 8 0 1 1 0 24 8 8 0 1 1-16 0 8 8 0 1 1 0-24 8 8 0 0 1 8-8zm0 15a5 5 0 1 0 0 10 5 5 0 0 0 0-10z" fill="currentColor"/></svg>',
   };
+  const WRONG_MAZE = [
+    '{name} vient de rencontrer une cloison. Retour au départ.',
+    'Bruit sourd dans le noir. {name} repart du début, et le nez en a pris un coup.',
+    '{name} a foncé dans le mur. Le guide n’y est peut-être pas pour rien.',
+  ];
+  const WRONG_GRID = [
+    'Le vitrail de {name} ne fait pas céder le loquet. Sa gauche est-elle bien sa gauche ?',
+    'Le loquet ne bouge pas. Dans un miroir, {name}, tout s’inverse.',
+  ];
   const SYM_NAME = { moon: 'Lune', star: 'Étoile', tower: 'Tour', flower: 'Fleur' };
   const ICON = {
     bulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></svg>',
@@ -55,6 +125,7 @@
   let nameDraft = load('ebib_name', ''), letterDraft = '', draftFor = '';
   let reveal = null, notesOpen = false, teaseOpen = false, hintArmed = false, envelopeOpen = false, confirmQuit = false;
   let introSeen = false, ambienceOn = load('ebib_ambience', false);
+  let spicyDraft = false, lampRun = 0, lampLit = false, lampPlaying = false, cardTimer = null;
   let audioCtx = null, ambience = null, whiteNoise = null;
   let profileT, hintT, toastT, pollT;
 
@@ -155,17 +226,18 @@
       draftFor = m.code;
       if (m.myName) nameDraft = m.myName;
       letterDraft = m.myLetter || '';
+      spicyDraft = !!m.mySpicy;
       introSeen = load('ebib_intro_' + m.code, false);
       if (nameDraft && !m.myName) act({ t: 'profile', name: nameDraft });
     }
     if (prev && prev.phase === 'done' && m.phase === 'lobby') {
-      letterDraft = ''; envelopeOpen = false; reveal = null;
+      letterDraft = ''; spicyDraft = false; envelopeOpen = false; reveal = null;
       for (let i = 0; i < m.total; i++) store(scratchKey(m.code, i), null);
     }
     if (m.phase === 'playing' && m.puzzle) {
       const key = m.code + ':' + m.puzzle.idx;
       if (key !== lastStepKey) {
-        lastStepKey = key; typed = ''; wheelTurn = 0; hintArmed = false;
+        lastStepKey = key; typed = ''; wheelTurn = 0; hintArmed = false; lampRun++; lampLit = false; lampPlaying = false;
         scratch = load(scratchKey(m.code, m.puzzle.idx), emptyScratch());
         window.scrollTo(0, 0);
       }
@@ -178,9 +250,13 @@
     const me = state.role;
     if (e.kind === 'note') { if (e.by !== me) playNote(e.level); }
     else if (e.kind === 'wrong') {
-      const lines = e.guess ? WRONG_LINES : WRONG_MELODY;
+      const lines = e.what === 'maze' ? WRONG_MAZE : e.what === 'grid' ? WRONG_GRID : e.guess ? WRONG_LINES : WRONG_MELODY;
       toast(fill(pickOne(lines), { name: nameOf(e.by), guess: e.guess }), true);
       playThud(); shakeAnswer();
+    } else if (e.kind === 'round') {
+      if (e.agree) playPing(); else playThud();
+    } else if (e.kind === 'quizfail') {
+      toast(`« Vous vous connaissez vraiment, tous les deux ? » Le contrôleur repose d’autres questions.`, true);
     } else if (e.kind === 'solved') {
       const show = () => {
         reveal = { ...e, stage: e.finished ? 'door' : 'letter' };
@@ -188,7 +264,7 @@
         else playChime();
         render();
       };
-      e.idx === 4 ? setTimeout(show, 650) : show();
+      state.volume === 1 && e.idx === 4 ? setTimeout(show, 650) : show();
     } else if (e.kind === 'start') playChime();
     else if (e.kind === 'tease') { if (e.from !== me) flyTease(e); }
     else if (e.kind === 'hint') {
@@ -248,6 +324,22 @@
     const out = c.createGain();
     out.gain.setValueAtTime(0.0001, c.currentTime); out.gain.exponentialRampToValueAtTime(0.5, c.currentTime + 2);
     out.connect(c.destination);
+    if (state && state.volume === 2) {
+      // Le roulement du train : un grondement grave et le double choc des rails.
+      const rumble = c.createBufferSource(); rumble.buffer = noiseBuffer(c, 6, true); rumble.loop = true;
+      const low = c.createBiquadFilter(); low.type = 'lowpass'; low.frequency.value = 240;
+      const rumbleGain = c.createGain(); rumbleGain.gain.value = 0.5;
+      rumble.connect(low); low.connect(rumbleGain); rumbleGain.connect(out); rumble.start();
+      const clack = (when) => {
+        const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + when;
+        o.type = 'triangle'; o.frequency.value = 72;
+        g.gain.setValueAtTime(0.11, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+        o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.16);
+      };
+      const rails = setInterval(() => { clack(0); clack(0.17); }, 1250);
+      ambience = { out, stop() { clearInterval(rails); out.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.6); setTimeout(() => { rumble.stop(); out.disconnect(); }, 700); } };
+      return;
+    }
     const fire = c.createBufferSource(); fire.buffer = noiseBuffer(c, 6, true); fire.loop = true;
     const low = c.createBiquadFilter(); low.type = 'lowpass'; low.frequency.value = 520;
     const fireGain = c.createGain(); fireGain.gain.value = 0.32;
@@ -303,10 +395,23 @@
       ${CREST}
       <p class="eyebrow">Escape game pour deux</p>
       <h1>La Bibliothèque<br>d’Alexandrine</h1>
-      <p class="tag">Une porte fermée à clé. Deux écrans différents.<br>Et vous deux, chacun à un bout du fil.</p>
+      <p class="tag">Deux écrans différents, deux amoureux à retrouver,<br>et vous deux pour ouvrir les serrures.</p>
+      <div class="tomes">
+        <button class="tomecard t1" data-act="create" data-volume="1" ${busy ? 'disabled' : ''}>
+          <span class="tomeno">Tome I</span>
+          <b>La Bibliothèque</b>
+          <span class="tomewhere">À distance, en appel</span>
+          <span class="tomedesc">Une porte fermée à clé, onze ans de lettres et une heure pour sortir.</span>
+        </button>
+        <button class="tomecard t2" data-act="create" data-volume="2" ${busy ? 'disabled' : ''}>
+          <span class="tomeno">Tome II</span>
+          <b>Le Train de Nuit</b>
+          <span class="tomewhere">Dans la même pièce, dos à dos</span>
+          <span class="tomedesc">La suite de leur histoire : sept voitures, des questions qui comptent et des cartes à oser.</span>
+        </button>
+      </div>
       <div class="card entry">
-        <button class="btn" data-act="create" ${busy ? 'disabled' : ''}>${busy ? 'Ouverture des portes…' : 'Créer une salle'}</button>
-        <div class="sep">ou</div>
+        <div class="sep">l’autre t’a donné un code ?</div>
         <label class="sr" for="joincode">Code de la salle</label>
         <div class="joinrow">
           <input class="codeinput" id="joincode" maxlength="4" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" value="${esc(code)}">
@@ -315,9 +420,9 @@
         <div class="err" role="alert">${esc(homeError)}</div>
       </div>
       <ol class="how">
-        <li><b>Appelez-vous</b>L’appel, c’est votre seul moyen de jouer. Sans lui, personne ne sort.</li>
-        <li><b>Parlez</b>Vous ne voyez jamais la même chose. Il faut décrire, écouter, et assumer ses erreurs.</li>
-        <li><b>Retrouvez les lettres</b>Sept chapitres, une bonne heure de jeu, et une histoire d’amour à reconstituer.</li>
+        <li><b>Un téléphone chacun</b>Vous ne voyez jamais la même chose. Tout passe par la voix.</li>
+        <li><b>Parlez</b>Il faut décrire, écouter, et assumer ses erreurs. L’autre s’en souviendra.</li>
+        <li><b>Retrouvez les lettres</b>Sept étapes, une bonne heure de jeu, et une histoire d’amour à reconstituer.</li>
       </ol>
     </main>`;
   }
@@ -328,7 +433,8 @@
       <header class="lobbyhead">
         <p class="eyebrow">Salle d’attente</p>
         <div class="roomcode" aria-label="Code de la salle">${esc(s.code)}</div>
-        ${s.partner ? '' : `<button class="btn" data-act="invite">Inviter l’autre</button><p class="legend">Envoie le lien, lance l’appel, et attends ici.</p>`}
+        ${s.volume === 2 ? '<p class="lobbytome">Tome II · Le Train de Nuit</p>' : ''}
+        ${s.partner ? '' : `<button class="btn" data-act="invite">Inviter l’autre</button><p class="legend">${tome().lobbyHint}</p>`}
       </header>
       <div class="players">
         <div class="pl me">
@@ -346,8 +452,12 @@
       <div class="card form">
         <label for="pname">Ton prénom <span>(ou le surnom que l’autre va détester)</span></label>
         <input id="pname" class="field" maxlength="24" autocomplete="off" placeholder="Comment t’appeler ?" value="${esc(nameDraft)}">
-        <label for="pletter">Un mot sous scellé <span>(facultatif, mais ça se verra)</span></label>
-        <textarea id="pletter" class="field" maxlength="800" rows="3" placeholder="Écris quelque chose à l’autre. Alexandrine le garde sous cire : il ne s’ouvrira qu’une fois la porte franchie.">${esc(letterDraft)}</textarea>
+        <label for="pletter">${tome().letterLabel} <span>(facultatif, mais ça se verra)</span></label>
+        <textarea id="pletter" class="field" maxlength="800" rows="3" placeholder="${tome().letterHolder}">${esc(letterDraft)}</textarea>
+        ${s.volume === 2 ? `<label class="spicy" for="pspicy">
+          <input type="checkbox" id="pspicy" ${spicyDraft ? 'checked' : ''}>
+          <span><b>Entractes osés</b> J’ai 18 ans ou plus, et je dis oui. Il faut vos deux oui, sinon les cartes restent tendres. Le jeu n’affiche jamais le choix de l’autre, et chaque carte peut être passée sans explication.</span>
+        </label>` : ''}
       </div>
       <div class="row">
         <button class="btn big" data-act="ready" ${s.partner ? '' : 'disabled'}>${s.ready ? 'Attends, je reviens' : s.partnerReady ? 'On y va' : 'Je suis là, on commence'}</button>
@@ -358,27 +468,22 @@
   }
 
   function viewIntro() {
+    const t = tome();
     return `<div class="modal intro" data-key="intro"><div class="sheet parchment">
       <p class="eyebrow ink">Prologue</p>
-      <p class="fade f1">Alexandrine gardait la grande bibliothèque. Augustin dessinait des cartes de pays où elle n’irait jamais. Pendant onze ans, ils ont vécu loin l’un de l’autre, et ils se sont écrit.</p>
-      <p class="fade f2">Pour que personne d’autre ne lise leurs lettres, elle les a cachées ici, derrière des mécanismes qui ne s’ouvrent qu’à deux voix.</p>
-      <p class="fade f3">Ce soir, la porte vient de se refermer derrière vous. Sur le pupitre, un billet encore frais :</p>
-      <blockquote class="hand fade f4">Vous êtes deux, vous êtes loin, et vous vous parlez. Parfait, ce sont les seules règles. Sortez d’ici avant l’aube. Et taquinez-vous : chez moi, c’est obligatoire.<cite>— A.</cite></blockquote>
-      <ul class="rules fade f5">
-        <li><b>Vos écrans sont différents.</b> Ce que tu vois, ${esc(nameOf(otherOf(state.role)))} ne le voit pas. Tout passe par la voix.</li>
-        <li><b>Un seul de vous deux tape la réponse.</b> Peu importe lequel, le mécanisme s’ouvre pour vous deux.</li>
-        <li><b>Les indices sont gratuits.</b> Sauf pour l’honneur : le registre note qui les demande.</li>
-      </ul>
+      ${t.prologue.map((line, i) => `<p class="fade f${i + 1}">${line}</p>`).join('')}
+      <blockquote class="hand fade f4">${t.note}<cite>— A.</cite></blockquote>
+      <ul class="rules fade f5">${t.rules(esc(nameOf(otherOf(state.role)))).map(([head, body]) => `<li><b>${head}</b>${body}</li>`).join('')}</ul>
       <div class="row fade f5">
-        <button class="btn" data-act="closeintro">Entrer dans la bibliothèque</button>
-        <button class="btn ghost ink ${ambienceOn ? 'active' : ''}" data-act="ambience" aria-pressed="${ambienceOn}">${ICON.fire}<span>Feu de cheminée : ${ambienceOn ? 'oui' : 'non'}</span></button>
+        <button class="btn" data-act="closeintro">${t.enter}</button>
+        <button class="btn ghost ink ${ambienceOn ? 'active' : ''}" data-act="ambience" aria-pressed="${ambienceOn}">${ICON.fire}<span>${t.ambience} : ${ambienceOn ? 'oui' : 'non'}</span></button>
       </div>
-      <p class="legend ink fade f5">Pour le feu de cheminée, un casque évite que l’autre l’entende dans l’appel.</p>
+      <p class="legend ink fade f5">${t.ambienceNote}</p>
     </div></div>`;
   }
 
   function sealsBar() {
-    return `<div class="seals" role="img" aria-label="${state.seals.filter((x) => x.solved).length} sceaux sur 6">${state.seals.map((s) => (s.solved
+    return `<div class="seals" role="img" aria-label="${state.seals.filter((x) => x.solved).length} ${tome().sealsWord} sur 6">${state.seals.map((s) => (s.solved
       ? `<div class="seal on">${esc(s.letter)}${s.number != null ? `<sup>${s.number}</sup>` : ''}</div>`
       : '<div class="seal"></div>')).join('')}</div>`;
   }
@@ -386,19 +491,19 @@
   function viewGame() {
     const s = state, p = s.puzzle, me = s.role, other = otherOf(me);
     const remaining = p.hintsMax - p.hints.length;
-    const light = ['clues', 'score', 'cipher'].includes(p.view.type);
+    const light = ['clues', 'score', 'cipher', 'ticket', 'chart', 'mazemap', 'line', 'notices'].includes(p.view.type);
     return `<main class="game" data-key="game">
       <header class="hud">
         <div class="hudleft"><span class="role">${esc(s.names[me])}</span><span class="timer" id="timer">${fmt(elapsed())}</span></div>
         <div class="hudright">
           <span class="conn ${online ? '' : 'off'}" title="${online ? 'Connecté' : 'Hors de l’écran pour le moment'}">${esc(s.names[other])}</span>
-          <button class="iconbtn ${ambienceOn ? 'active' : ''}" data-act="ambience" aria-label="Feu de cheminée" aria-pressed="${ambienceOn}">${ICON.fire}</button>
+          <button class="iconbtn ${ambienceOn ? 'active' : ''}" data-act="ambience" aria-label="${tome().ambience}" aria-pressed="${ambienceOn}">${ICON.fire}</button>
         </div>
       </header>
       ${fails > 1 ? '<div class="netwarn">Connexion perdue, on réessaie…</div>' : ''}
       ${sealsBar()}
       <section class="puzzle" data-key="step-${p.idx}">
-        <p class="eyebrow">Chapitre ${ROMAN[p.idx]} sur ${ROMAN[s.total - 1]}</p>
+        <p class="eyebrow">${tome().chapter} ${ROMAN[p.idx]} sur ${ROMAN[s.total - 1]}</p>
         <h2 class="ptitle">${esc(p.title)}</h2>
         <p class="pstory">${esc(p.story)}</p>
         <div class="brief">
@@ -443,9 +548,112 @@
       case 'score': return staff(v);
       case 'keys': return `<div class="keys">${[1, 2, 3, 4].map((l) => `<button class="key" data-level="${l}" data-act="key" aria-label="Note ${l}">${l}<small>${['grave', 'médium', 'haut', 'aigu'][l - 1]}</small></button>`).join('')}</div>${lamps(p.input.length)}`;
       case 'door': return door(v);
+      case 'board': return board(v);
+      case 'ticket': return `<div class="stub"><p class="stubhead">Compagnie du Nocturne · Billet n° <span>▒▒▒</span></p><ul class="stublist">${v.clues.map((c) => `<li>${esc(c)}</li>`).join('')}</ul></div>`;
+      case 'lamp': return lamp();
+      case 'chart': return `<div class="chart">${Object.entries(v.chart).map(([l, code]) => `<div class="chartcell"><b>${l}</b><span>${code.replace(/\./g, '•').replace(/-/g, '▬')}</span></div>`).join('')}</div><p class="legend">• éclat court, ▬ éclat long</p>`;
+      case 'mazemap': return mazeMap(v);
+      case 'mazepad': return mazePad(v, p.pos);
+      case 'quiz': return quiz(p.quiz);
+      case 'mirrorsee': return `<div class="mirror see">${colHead(v.size)}${v.cells.map((on) => `<div class="pane ${on ? 'lit' : ''}"></div>`).join('')}</div><p class="legend">Les lignes se comptent de haut en bas, les colonnes de gauche à droite.</p>`;
+      case 'mirrordo': return `<div class="mirror do">${colHead(v.size)}${Array.from({ length: v.size * v.size }, (_, i) => `<button class="pane ${scratch.marks.includes(i) ? 'lit' : ''}" data-cell="${i}" aria-pressed="${scratch.marks.includes(i)}" aria-label="Ligne ${Math.floor(i / v.size) + 1}, colonne ${i % v.size + 1}"></button>`).join('')}</div>`;
+      case 'line': return `<div class="timeline"><div class="tl start"><b>Départ</b><span data-start="${esc(v.start)}">${esc(v.start)}</span></div>${v.legs.map((l) => `<div class="tl"><b>Jusqu’à ${esc(l.to)}</b><span data-min="${l.min}">${l.min} min</span></div>`).join('')}</div>`;
+      case 'notices': return `<p class="stubhead">Avis du chef de train</p><ul class="stublist">${v.notices.map((n) => `<li data-delta="${n.delta}">${esc(n.text)}</li>`).join('')}</ul>`;
       default: return '';
     }
   }
+
+  function board(v) {
+    return `<div class="board"><div class="boardrow head"><span>N°</span><span>Destination</span><span>Départ</span><span>Voie</span></div>${v.rows.map((r, i) => `<button class="boardrow ${scratch.marks.includes(i) ? 'out' : ''}" data-cell="${i}" data-num="${r.num}" data-time="${esc(r.time)}" data-voie="${r.voie}" data-city="${esc(r.city)}"><span>${r.num}</span><span>${esc(r.city)}</span><span>${esc(r.time)}</span><span>${r.voie}</span></button>`).join('')}</div><p class="legend">Touche une ligne pour barrer un train.</p>`;
+  }
+
+  function lamp() {
+    return `<div class="lampbox"><div class="lantern ${lampLit ? 'lit' : ''}" aria-hidden="true"><i></i></div>
+      <button class="btn ghost" data-act="lamp" ${lampPlaying ? 'disabled' : ''}>${lampPlaying ? 'La lanterne parle…' : 'Allumer la lanterne'}</button></div>
+      <p class="legend">Le signal se répète autant de fois que tu veux.</p>`;
+  }
+  function playLamp() {
+    const seq = state.puzzle.view.morse, run = ++lampRun;
+    lampPlaying = true; render();
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    (async () => {
+      await wait(500);
+      for (const letter of seq) {
+        for (const sign of letter) {
+          if (run !== lampRun) return;
+          const dur = sign === '.' ? 320 : 960;
+          lampLit = true; render();
+          tone(620, dur / 1000, 'sine', 0.05);
+          if (navigator.vibrate) navigator.vibrate(dur);
+          await wait(dur);
+          lampLit = false; render();
+          await wait(360);
+        }
+        await wait(1100);
+      }
+      if (run === lampRun) { lampPlaying = false; render(); }
+    })();
+  }
+
+  function mazeWalls(v) {
+    const C = 60, lines = [];
+    v.open.forEach((bits, i) => {
+      const r = Math.floor(i / v.size), c = i % v.size, x = c * C, y = r * C;
+      if (!(bits & 1)) lines.push(`M${x} ${y}h${C}`);
+      if (!(bits & 2)) lines.push(`M${x + C} ${y}v${C}`);
+      if (!(bits & 4)) lines.push(`M${x} ${y + C}h${C}`);
+      if (!(bits & 8)) lines.push(`M${x} ${y}v${C}`);
+    });
+    return lines.join('');
+  }
+  const mazeCenter = (i, size) => [(i % size) * 60 + 30, Math.floor(i / size) * 60 + 30];
+  function mazeLabels(size) {
+    return Array.from({ length: size }, (_, i) => `<text class="mz" x="${i * 60 + 30}" y="-8">${i + 1}</text><text class="mz" x="-12" y="${i * 60 + 36}">${i + 1}</text>`).join('');
+  }
+  function mazeMarks(v) {
+    const [sx, sy] = mazeCenter(v.start, v.size), [gx, gy] = mazeCenter(v.goal, v.size);
+    return `<text class="mzmark" x="${sx}" y="${sy + 7}">D</text><text class="mzmark goal" x="${gx}" y="${gy + 7}">S</text>`;
+  }
+  function mazeMap(v) {
+    const S = v.size * 60;
+    return `<div class="maze"><svg viewBox="-24 -24 ${S + 32} ${S + 32}" role="img" aria-label="Plan du couloir" data-open="${v.open.join(',')}">${mazeLabels(v.size)}${mazeMarks(v)}<path class="mzwall" d="${mazeWalls(v)}"/></svg></div>
+      <p class="legend">D : le départ. S : la sortie. Les colonnes et les lignes sont numérotées de 1 à ${v.size}.</p>`;
+  }
+  function mazePad(v, pos) {
+    const S = v.size * 60;
+    const grid = Array.from({ length: v.size + 1 }, (_, i) => `<path class="mzgrid" d="M${i * 60} 0v${S}M0 ${i * 60}h${S}"/>`).join('');
+    const [x, y] = mazeCenter(pos, v.size);
+    const col = pos % v.size + 1, row = Math.floor(pos / v.size) + 1;
+    const arrow = (dir, label, sym) => `<button class="padbtn ${dir}" data-act="move" data-dir="${dir}" aria-label="${label}">${sym}</button>`;
+    return `<div class="maze dark"><svg viewBox="-24 -24 ${S + 32} ${S + 32}" role="img" aria-label="Ta position : colonne ${col}, ligne ${row}">${mazeLabels(v.size)}${grid}${mazeMarks(v)}<circle class="mztoken" r="14" style="transform:translate(${x}px,${y}px)"/></svg></div>
+      <p class="mzpos" id="mzpos">Tu es colonne <b>${col}</b>, ligne <b>${row}</b></p>
+      <div class="pad">${arrow('N', 'Vers le haut', '▲')}${arrow('W', 'Vers la gauche', '◀')}${arrow('E', 'Vers la droite', '▶')}${arrow('S', 'Vers le bas', '▼')}</div>`;
+  }
+
+  function quiz(q) {
+    const s = state, me = s.role, other = otherOf(me);
+    const votesHtml = q.myVote
+      ? `<p class="qwait">Tu as répondu <b>${esc(s.names[q.myVote])}</b>. ${q.theyVoted ? 'Le contrôleur vérifie…' : `On attend ${esc(s.names[other])}.`}</p>`
+      : `<div class="qbtns"><button class="btn" data-act="vote" data-who="${me}">${esc(s.names[me])}</button><button class="btn" data-act="vote" data-who="${other}">${esc(s.names[other])}</button></div>`;
+    const last = q.last ? `<div class="qlast ${q.last.agree ? 'yes' : 'no'}"><b>${q.last.agree ? 'D’accord' : 'Désaccord'}</b><span>${esc(q.last.q)} ${esc(s.names.A)} a dit ${esc(s.names[q.last.A])}, ${esc(s.names.B)} a dit ${esc(s.names[q.last.B])}.</span></div>` : '';
+    return `<div class="quiz" data-key="quiz">
+      <div class="qscore"><span>Question ${q.i + 1} sur ${q.total}</span><span>${q.agree} accord${q.agree > 1 ? 's' : ''} sur ${q.pass}</span></div>
+      <p class="question">${esc(q.question)}</p>
+      ${votesHtml}
+      ${last}
+    </div>`;
+  }
+
+  const colHead = (n) => `<div class="mirhead" style="grid-column:1/-1">${Array.from({ length: n }, (_, i) => `<span>${i + 1}</span>`).join('')}</div>`;
+
+  function moveToken(dir) {
+    if (!state || !state.puzzle || state.puzzle.input.kind !== 'maze' || state.puzzle.view.type !== 'mazepad') return;
+    act({ t: 'move', dir });
+  }
+  addEventListener('keydown', (e) => {
+    const dir = { ArrowUp: 'N', ArrowRight: 'E', ArrowDown: 'S', ArrowLeft: 'W' }[e.key];
+    if (dir && !e.target.closest('input,textarea') && state && state.puzzle && state.puzzle.input.kind === 'maze') { e.preventDefault(); moveToken(dir); }
+  });
 
   function sheet(v) {
     return `<div class="sheetgrid" style="grid-template-columns:repeat(${v.cols},1fr)">${v.cells.map((on, i) => `<button class="cell ${on ? 'on ' + v.tint : ''} ${scratch.marks.includes(i) ? 'mark' : ''}" data-cell="${i}" aria-label="Ligne ${Math.floor(i / v.cols) + 1}, colonne ${i % v.cols + 1}, ${on ? 'allumée' : 'éteinte'}" aria-pressed="${scratch.marks.includes(i)}"></button>`).join('')}</div>
@@ -513,6 +721,12 @@
   function viewInput(p) {
     const inp = p.input;
     if (inp.kind === 'keys') return p.view.type === 'keys' ? '' : `<div class="answerbox"><div class="alabel">Notes jouées au clavecin</div>${lamps(inp.length)}</div>`;
+    if (inp.kind === 'maze' || inp.kind === 'quiz') return '';
+    if (inp.kind === 'grid') {
+      return p.view.type === 'mirrordo'
+        ? '<div class="answerbox"><button class="btn" data-act="submitgrid">Essayer le loquet</button></div>'
+        : `<div class="answerbox"><div class="alabel">${esc(nameOf(otherOf(state.role)))} essaiera le loquet quand ce sera prêt.</div></div>`;
+    }
     const digits = inp.kind === 'digits';
     const slots = Array.from({ length: inp.length }, (_, i) => `<span class="slot ${typed[i] ? 'full' : ''} ${i === typed.length ? 'next' : ''}">${esc(typed[i] || '')}</span>`).join('');
     return `<div class="answerbox">
@@ -535,23 +749,34 @@
     if (r.stage === 'door') {
       return `<div class="doors" data-key="doors"><div class="glow"></div><div class="leaf l"><i></i></div><div class="leaf r"><i></i></div><div class="doorword">${esc(state.finalWord || 'REVOIR')}</div></div>`;
     }
-    if (r.stage === 'dare') {
-      const d = r.dare;
-      const text = d.to ? fill(d.text, { x: nameOf(d.to), y: nameOf(otherOf(d.to)) }) : d.text;
-      return `<div class="modal" data-key="dare-${r.idx}"><div class="sheet darecard">
-        <p class="eyebrow">Entracte · À voix haute</p>
+    if (r.stage === 'card') {
+      const c = r.cards[r.card];
+      const text = c.to ? fill(c.text, { x: nameOf(c.to), y: nameOf(otherOf(c.to)) }) : c.text;
+      const next = r.card < r.cards.length - 1;
+      const train = state.volume === 2;
+      const countdown = c.secs
+        ? `<div class="cardtimer">${cardTimer
+          ? `<b>${cardTimer.left}</b><span>secondes</span>`
+          : `<button class="btn ghost" data-act="cardtimer" data-secs="${c.secs}">Lancer la minute</button>`}</div>`
+        : '';
+      return `<div class="modal" data-key="card-${r.idx}-${r.card}"><div class="sheet darecard ${c.kind}">
+        <p class="eyebrow">${c.kind === 'deep' ? 'À voix basse' : train ? 'Entracte' : 'Entracte · À voix haute'}</p>
         <p class="dare">${esc(text)}</p>
-        <p class="legend">Alexandrine écoute. Elle n’a que ça à faire depuis deux siècles.</p>
-        <button class="btn" data-act="closereveal">On continue</button>
+        ${countdown}
+        <p class="legend">${tome().cardLegend}</p>
+        <button class="btn" data-act="${next ? 'nextcard' : 'closereveal'}">${next ? 'Carte suivante' : 'On continue'}</button>
+        ${train ? `<button class="linkbtn" data-act="${next ? 'nextcard' : 'closereveal'}" data-skip="1">On passe celle-là</button>` : ''}
       </div></div>`;
     }
+    const t = tome();
     const seal = r.seal ? `<div class="sealbox"><div class="bigseal">${esc(r.seal.letter)}${r.seal.number != null ? `<sup>${r.seal.number}</sup>` : ''}</div>
-      <p class="sealmsg">${r.seal.number != null ? `Le numéro <b>${r.seal.number}</b> n’apparaît que chez toi. Garde-le, ou dis-le : à toi de voir.` : `Ce sceau a un numéro, mais c’est ${esc(nameOf(otherOf(state.role)))} qui l’a.`}</p></div>` : '';
+      <p class="sealmsg">${r.seal.number != null ? `Le numéro <b>${r.seal.number}</b> n’apparaît que chez toi. Garde-le, ou dis-le : à toi de voir.` : `Ce ${t.sealWord} a un numéro, mais c’est ${esc(nameOf(otherOf(state.role)))} qui l’a.`}</p></div>` : '';
+    const hasCards = r.cards && r.cards.length;
     return `<div class="modal" data-key="letter-${r.idx}"><div class="sheet letterwrap">
-      <p class="eyebrow">${r.finished ? 'Dernière lettre' : `Lettre retrouvée · ${esc(r.title)}`}</p>
+      <p class="eyebrow">${r.finished ? t.lastLetter : `${t.foundLetter} · ${esc(r.title)}`}</p>
       <div class="letter parchment"><p class="hand">${esc(r.page.text)}</p><p class="sig">— ${esc(r.page.from)}</p></div>
       ${seal}
-      <button class="btn" data-act="${r.dare ? 'toDare' : 'closereveal'}">${r.finished ? 'Sortir' : 'Tourner la page'}</button>
+      <button class="btn" data-act="${hasCards ? 'toDare' : 'closereveal'}">${r.finished ? t.leaveBtn : 'Tourner la page'}</button>
     </div></div>`;
   }
 
@@ -567,7 +792,8 @@
   function viewDone() {
     const s = state, me = s.role, other = otherOf(me);
     const hints = s.stats.A.hints + s.stats.B.hints, wrong = s.stats.A.wrong + s.stats.B.wrong;
-    const share = `On a ouvert la porte de la Bibliothèque d’Alexandrine en ${fmt(s.elapsed)} (${plural(hints, 'indice')}, ${plural(wrong, 'erreur')}). ${location.origin}`;
+    const t = tome();
+    const share = `On a ouvert la dernière porte de ${t.shareName} en ${fmt(s.elapsed)} (${plural(hints, 'indice')}, ${plural(wrong, 'erreur')}). ${location.origin}`;
     const awards = [
       award('wrong', 'La gâchette facile', '{name}, avec {n} essai(s) raté(s). Le registre s’en souviendra.', '{n} erreur(s) de chaque côté. Vous faites la paire.', 'Aucune erreur. Alexandrine soupçonne une tricherie.'),
       award('hints', 'L’humilité', '{name} a demandé {n} indice(s). C’est noté.', '{n} indice(s) de chaque côté. Personne n’a craqué seul.', 'Zéro indice. Quel orgueil.'),
@@ -579,13 +805,13 @@
       : `<div class="letter parchment opened"><p class="hand">${esc(s.names[other])} n’a rien glissé sous la porte. Alexandrine prend note : cette personne te doit un message. Ce soir.</p></div>`;
     return `<main class="done" data-key="done">
       ${CREST}
-      <p class="eyebrow">La porte est ouverte</p>
-      <h1>Dehors, c’est l’aube</h1>
+      <p class="eyebrow">${t.outEyebrow}</p>
+      <h1>${t.outTitle}</h1>
       <div class="finalword" aria-label="${esc(s.finalWord)}">${esc(s.finalWord).split('').map((c, i) => `<span style="--i:${i}">${c}</span>`).join('')}</div>
-      <p class="story">Ils se sont revus au printemps. À votre tour.</p>
+      <p class="story">${t.outStory}</p>
       <section class="sealed">
-        <h2>Le mot de ${esc(s.names[other])}</h2>
-        ${envelopeOpen ? letterBody : `<button class="envelope" data-act="openenvelope" aria-label="Briser le sceau"><span class="flap"></span><span class="wax">${esc((s.names[other] || 'A')[0].toUpperCase())}</span><em>Briser le sceau</em></button>`}
+        <h2>${t.letterFrom} ${esc(s.names[other])}</h2>
+        ${envelopeOpen ? letterBody : `<button class="envelope" data-act="openenvelope" aria-label="${t.openLabel}"><span class="flap"></span><span class="wax">${esc((s.names[other] || 'A')[0].toUpperCase())}</span><em>${t.openLabel}</em></button>`}
       </section>
       <div class="stats">
         <div class="stat"><b>${fmt(s.elapsed)}</b><span>Temps</span></div>
@@ -593,14 +819,14 @@
         <div class="stat"><b>${wrong}</b><span>${wrong > 1 ? 'Erreurs' : 'Erreur'}</span></div>
       </div>
       <section class="awards">
-        <h2>Le registre d’Alexandrine</h2>
+        <h2>${t.registry}</h2>
         ${awards.map((a) => `<div class="award"><b>${esc(a.title)}</b><span>${esc(a.text)}</span></div>`).join('')}
       </section>
-      <details class="journal"><summary>Relire toutes leurs lettres</summary>
+      <details class="journal"><summary>${t.rereadLabel}</summary>
         ${s.journal.map((j) => `<div class="jl"><p>${esc(j.text)}</p><span>— ${esc(j.from)}</span></div>`).join('')}
       </details>
       <div class="row">
-        <button class="btn" data-act="restart">Rejouer, avec de nouveaux codes</button>
+        <button class="btn" data-act="restart">${t.replay}</button>
         <button class="btn ghost" data-act="share" data-text="${esc(share)}">Copier notre score</button>
       </div>
       <div class="row"><button class="linkbtn dim" data-act="quitconfirm">Quitter la salle</button></div>
@@ -608,7 +834,7 @@
   }
 
   /* ---------- rendu ---------- */
-  function elapsed() { if (!state) return 0; return state.phase === 'playing' ? state.elapsed + (Date.now() - recv) : state.elapsed; }
+  function elapsed() { if (!state) return 0; return state.phase === 'playing' && !state.paused ? state.elapsed + (Date.now() - recv) : state.elapsed; }
 
   // Mise à jour minimale du DOM : garde le focus, ne rejoue pas les animations, laisse tourner le disque.
   function morph(parent, next) {
@@ -636,11 +862,14 @@
     for (const { name, value } of Array.from(b.attributes)) {
       if (a.getAttribute(name) !== value) a.setAttribute(name, value);
     }
-    if (a.nodeName === 'INPUT' && document.activeElement !== a) a.value = b.getAttribute('value') || '';
+    if (a.nodeName === 'INPUT' && a.type === 'checkbox') a.checked = b.hasAttribute('checked');
+    else if (a.nodeName === 'INPUT' && document.activeElement !== a) a.value = b.getAttribute('value') || '';
   }
 
   function render() {
     document.body.dataset.phase = state ? state.phase : 'home';
+    const volume = String((state && state.volume) || 1);
+    if (document.body.dataset.volume !== volume) { document.body.dataset.volume = volume; if (volume === '2') paintTrainScene(); }
     let html;
     if (!state) html = viewHome();
     else if (state.phase === 'lobby') html = viewLobby();
@@ -670,7 +899,7 @@
     homeError = '';
     enter({ t: 'join', code: c });
   }
-  function pushProfile() { clearTimeout(profileT); if (state && state.phase === 'lobby') act({ t: 'profile', name: nameDraft, letter: letterDraft }); }
+  function pushProfile() { clearTimeout(profileT); if (state && state.phase === 'lobby') act({ t: 'profile', name: nameDraft, letter: letterDraft, spicy: spicyDraft }); }
   function copy(text, msg) {
     const done = () => toast(msg);
     const fallback = () => { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) {} ta.remove(); };
@@ -679,7 +908,7 @@
   }
   function invite() {
     const url = location.origin + '/?r=' + state.code;
-    const text = 'Une bibliothèque, une porte fermée à clé, et tu es la seule personne qui peut m’en sortir. Appelle-moi et viens :';
+    const text = tome().invite;
     if (navigator.share && matchMedia('(pointer:coarse)').matches) {
       navigator.share({ title: 'La Bibliothèque d’Alexandrine', text, url }).catch((e) => { if (e.name !== 'AbortError') copy(`${text} ${url}`, 'Invitation copiée. À toi d’envoyer.'); });
     } else copy(`${text} ${url}`, 'Invitation copiée. À toi d’envoyer.');
@@ -713,9 +942,9 @@
       return;
     }
     switch (b.dataset.act) {
-      case 'create': homeError = ''; enter({ t: 'create' }); break;
+      case 'create': homeError = ''; enter({ t: 'create', volume: Number(b.dataset.volume) || 1 }); break;
       case 'join': tryJoin(document.getElementById('joincode').value); break;
-      case 'ready': clearTimeout(profileT); store('ebib_name', nameDraft); act({ t: 'ready', value: !state.ready, name: nameDraft, letter: letterDraft }); break;
+      case 'ready': clearTimeout(profileT); store('ebib_name', nameDraft); act({ t: 'ready', value: !state.ready, name: nameDraft, letter: letterDraft, spicy: spicyDraft }); break;
       case 'swap': act({ t: 'swap' }); break;
       case 'invite': invite(); break;
       case 'closeintro': introSeen = true; store('ebib_intro_' + state.code, true); playPage(); render(); break;
@@ -731,8 +960,19 @@
       case 'wl': wheelTurn--; render(); break;
       case 'wr': wheelTurn++; render(); break;
       case 'key': playNote(Number(b.dataset.level)); act({ t: 'key', level: Number(b.dataset.level) }); break;
-      case 'toDare': reveal.stage = 'dare'; playPage(); render(); break;
-      case 'closereveal': reveal = null; playPage(); render(); break;
+      case 'toDare': reveal.stage = 'card'; reveal.card = 0; playPage(); render(); break;
+      case 'nextcard': stopCardTimer(); reveal.card++; playPage(); render(); break;
+      case 'closereveal': stopCardTimer(); reveal = null; if (state.paused) act({ t: 'resume' }); playPage(); render(); break;
+      case 'cardtimer': startCardTimer(Number(b.dataset.secs)); break;
+      case 'lamp': if (!lampPlaying) playLamp(); break;
+      case 'move': moveToken(b.dataset.dir); break;
+      case 'vote': act({ t: 'vote', who: b.dataset.who }); break;
+      case 'submitgrid': {
+        const size = state.puzzle.view.size;
+        const answer = Array.from({ length: size * size }, (_, i) => (scratch.marks.includes(i) ? '1' : '0')).join('');
+        act({ t: 'submit', answer });
+        break;
+      }
       case 'openenvelope': envelopeOpen = true; playThud(); playChime(); hearts(); render(); break;
       case 'restart': act({ t: 'restart' }); break;
       case 'share': copy(b.dataset.text, 'Score copié'); break;
@@ -744,6 +984,16 @@
       case 'quitconfirm': leave(); break;
     }
   });
+  function stopCardTimer() { if (cardTimer) clearInterval(cardTimer.id); cardTimer = null; }
+  function startCardTimer(secs) {
+    stopCardTimer();
+    cardTimer = { left: secs, id: setInterval(() => {
+      cardTimer.left--;
+      if (cardTimer.left <= 0) { stopCardTimer(); playChime(); if (navigator.vibrate) navigator.vibrate(300); }
+      render();
+    }, 1000) };
+    playPing(); render();
+  }
   function leave() {
     confirmQuit = false;
     leaving = true;
@@ -763,6 +1013,9 @@
       t.value = t.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
     } else if (t.id === 'notes') {
       store('ebib_notes_' + state.code, t.value);
+    } else if (t.id === 'pspicy') {
+      spicyDraft = t.checked;
+      pushProfile();
     } else if (t.id === 'pname' || t.id === 'pletter') {
       if (t.id === 'pname') { nameDraft = t.value; store('ebib_name', nameDraft); } else letterDraft = t.value;
       clearTimeout(profileT); profileT = setTimeout(pushProfile, 700);
@@ -847,7 +1100,7 @@
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     let lastFrame = 0;
     (function tick(now) {
-      if (!document.hidden && now - lastFrame >= 40) {
+      if (!document.hidden && document.body.dataset.volume !== '2' && now - lastFrame >= 40) {
         lastFrame = now;
         cx.clearRect(0, 0, W, H);
         for (const p of parts) {
@@ -859,6 +1112,68 @@
       requestAnimationFrame(tick);
     })(0);
   })();
+
+  /* ---------- décor du train : paysages peints une fois, qu'on fait glisser ---------- */
+  let scenePainted = false;
+  function paintTrainScene() {
+    if (scenePainted) return;
+    scenePainted = true;
+    const scene = document.getElementById('scene');
+    const strip = (cls, width, height, draw) => {
+      const cv = document.createElement('canvas');
+      cv.width = width; cv.height = height;
+      draw(cv.getContext('2d'), width, height);
+      const el = document.createElement('div');
+      el.className = 'strip ' + cls;
+      el.style.setProperty('--tile', width + 'px');
+      el.style.height = height + 'px';
+      el.style.backgroundImage = `url(${cv.toDataURL()})`;
+      scene.appendChild(el);
+    };
+    // La ligne d'horizon se referme sur elle-même pour que la bande boucle sans raccord visible.
+    const ridge = (cx, W, H, base, amp, color, seed) => {
+      const waves = [[2, amp], [5, amp * 0.5], [11, amp * 0.22], [23, amp * 0.1]].map(([n, a], i) => [n, a, seed * (i + 1)]);
+      cx.beginPath(); cx.moveTo(0, H);
+      for (let x = 0; x <= W; x += 4) {
+        const y = base - waves.reduce((s, [n, a, ph]) => s + a * Math.sin((x / W) * n * 2 * Math.PI + ph), 0);
+        cx.lineTo(x, y);
+      }
+      cx.lineTo(W, H); cx.closePath(); cx.fillStyle = color; cx.fill();
+    };
+    const sky = document.createElement('canvas');
+    sky.className = 'sky';
+    sky.width = innerWidth; sky.height = Math.round(innerHeight * 0.62);
+    const sc = sky.getContext('2d');
+    const g = sc.createLinearGradient(0, 0, 0, sky.height);
+    g.addColorStop(0, '#060a1e'); g.addColorStop(0.7, '#142048'); g.addColorStop(1, '#2a3264');
+    sc.fillStyle = g; sc.fillRect(0, 0, sky.width, sky.height);
+    for (let i = 0; i < sky.width / 6; i++) {
+      sc.fillStyle = `rgba(235,235,255,${(Math.random() * 0.7 + 0.15).toFixed(2)})`;
+      const s = Math.random() < 0.08 ? 2 : 1;
+      sc.fillRect(Math.random() * sky.width, Math.random() * sky.height * 0.85, s, s);
+    }
+    const mx = sky.width * 0.86, my = Math.min(sky.height * 0.14, 90);
+    const halo = sc.createRadialGradient(mx, my, 10, mx, my, 110);
+    halo.addColorStop(0, 'rgba(245,232,190,.42)'); halo.addColorStop(1, 'rgba(245,232,190,0)');
+    sc.fillStyle = halo; sc.fillRect(mx - 110, my - 110, 220, 220);
+    sc.fillStyle = '#f3e7c0'; sc.beginPath(); sc.arc(mx, my, 24, 0, 6.283); sc.fill();
+    scene.appendChild(sky);
+    strip('far', 1600, 220, (cx, W, H) => ridge(cx, W, H, 150, 34, '#111a3d', 1.3));
+    strip('mid', 1400, 180, (cx, W, H) => ridge(cx, W, H, 118, 24, '#0b1230', 2.7));
+    strip('near', 1000, 150, (cx, W, H) => {
+      ridge(cx, W, H, 110, 9, '#050917', 0.6);
+      cx.strokeStyle = '#050917'; cx.lineWidth = 2.5;
+      for (let x = 60; x < W; x += 250) {
+        cx.beginPath(); cx.moveTo(x, 118); cx.lineTo(x, 22); cx.moveTo(x - 13, 34); cx.lineTo(x + 13, 34); cx.stroke();
+        cx.lineWidth = 1;
+        cx.beginPath(); cx.moveTo(x + 13, 34); cx.quadraticCurveTo(x + 125, 62, x + 237, 34); cx.stroke();
+        cx.lineWidth = 2.5;
+      }
+    });
+    const frame = document.createElement('div');
+    frame.className = 'trainframe';
+    scene.appendChild(frame);
+  }
 
   // Grain du papier : une petite image calculée une fois, répétée par le CSS.
   (function paperGrain() {

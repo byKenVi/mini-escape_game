@@ -20,9 +20,9 @@ async function readBody(req) {
 const noRoom = () => new G.GameError('no_room', 'Salle introuvable. Vérifie le code.', 404);
 const forbidden = () => new G.GameError('forbidden', 'Tu ne fais plus partie de cette salle.', 403);
 
-async function create() {
+async function create(volume) {
   for (let i = 0; i < 10; i++) {
-    const room = G.createRoom(G.newCode());
+    const room = G.createRoom(G.newCode(), volume);
     if (await store.insert(room.code, room)) {
       return { you: { code: room.code, token: room.players.A.token }, state: G.snapshot(room, 'A') };
     }
@@ -79,7 +79,7 @@ module.exports = async (req, res) => {
     if (req.method !== 'POST') return send(res, 405, { error: 'method', msg: 'Méthode non autorisée.' });
     const msg = await readBody(req);
     if (!msg || typeof msg.t !== 'string') throw new G.GameError('bad', 'Message invalide.');
-    if (msg.t === 'create') return send(res, 200, await create());
+    if (msg.t === 'create') return send(res, 200, await create(msg.volume));
     const code = String(msg.code || '').toUpperCase().trim();
     if (msg.t === 'join') return send(res, 200, await join(code, msg.token));
     return send(res, 200, await action(msg, code, msg.token));
