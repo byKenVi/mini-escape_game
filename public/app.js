@@ -135,7 +135,7 @@
   let reveal = null, surpriseOpen = false, notesOpen = false, teaseOpen = false, hintArmed = false, envelopeOpen = false, confirmQuit = false;
   let introSeen = false, ambienceOn = load('ebib_ambience', false);
   let cardDraft = '', surpriseDraft = '', lastInterlude = '';
-  let spicyDraft = false, lampRun = 0, lampLit = false, lampPlaying = false, cardTimer = null;
+  let spicyDraft = true, lampRun = 0, lampLit = false, lampPlaying = false, cardTimer = null;
   let audioCtx = null, ambience = null, whiteNoise = null;
   let profileT, hintT, toastT, pollT;
 
@@ -244,7 +244,7 @@
       if (nameDraft && !m.myName) act({ t: 'profile', name: nameDraft });
     }
     if (prev && prev.phase === 'done' && m.phase === 'lobby') {
-      letterDraft = ''; spicyDraft = false; cardDraft = ''; surpriseDraft = ''; surpriseOpen = false; envelopeOpen = false; reveal = null;
+      letterDraft = ''; spicyDraft = true; cardDraft = ''; surpriseDraft = ''; surpriseOpen = false; envelopeOpen = false; reveal = null;
       for (let i = 0; i < m.total; i++) store(scratchKey(m.code, i), null);
     }
     if (m.phase === 'playing' && m.puzzle) {
@@ -472,7 +472,7 @@
         ${s.volume === 2 ? trainFields(s, other) : ''}
         ${s.volume === 2 ? `<label class="spicy" for="pspicy">
           <input type="checkbox" id="pspicy" ${spicyDraft ? 'checked' : ''}>
-          <span><b>Entractes osés</b> J’ai 18 ans ou plus, et je dis oui. Si vous cochez tous les deux : un geste osé après chaque voiture, avec deux gestes tendres pour commencer en douceur. Sinon : uniquement des gestes tendres. Le jeu n’affiche jamais le choix de l’autre, et chaque carte peut être passée sans explication.</span>
+          <span><b>Entractes osés</b> Coché par défaut : j’ai 18 ans ou plus, et je dis oui. Avec vos deux oui, vous aurez un geste osé après chaque voiture, et deux gestes tendres pour commencer en douceur. Tu préfères rester sur des gestes tendres ? Décoche la case : il suffit qu’un seul de vous deux décoche pour que toute la partie soit tendre. Le jeu n’affiche jamais le choix de l’autre, et chaque carte peut être passée sans explication.</span>
         </label>` : ''}
       </div>
       <div class="row">
