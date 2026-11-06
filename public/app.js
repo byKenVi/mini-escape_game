@@ -4,12 +4,8 @@
   const $app = document.getElementById('app');
   const $toast = document.getElementById('toast');
   const $flyers = document.getElementById('flyers');
-  const ROLE_NAME = { A: 'L’Archiviste', B: 'Cartographe' };
-  const ROLE_DESC = {
-    A: 'Tu lis ce qui est écrit : grimoires, registres, partitions.',
-    B: 'Tu manies ce qui s’ouvre : cadenas, disques, clavecin.',
-  };
   const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+  // L'indice d'une taquinerie est envoyé au serveur : ne jamais réordonner, seulement ajouter à la fin.
   const TEASES = [
     { text: 'Réfléchis, ça te va bien' },
     { text: 'Tu écoutes, au moins ?' },
@@ -18,6 +14,7 @@
     { text: 'Mon petit génie' },
     { text: 'Je te garde quand même', heart: true },
     { text: 'Un bisou, pour la peine', heart: true },
+    { text: 'Les yeux sur ton écran, tricheur', volume: 2 },
   ];
   const WRONG_LINES = [
     '{name} propose « {guess} ». Le mécanisme ne daigne même pas bouger.',
@@ -36,6 +33,11 @@
   const TOMES = {
     1: {
       chapter: 'Chapitre', chapterAll: 'Chapitres',
+      roles: { A: 'L’Archiviste', B: 'Cartographe' },
+      roleDesc: {
+        A: 'Tu lis ce qui est écrit : grimoires, registres, partitions.',
+        B: 'Tu manies ce qui s’ouvre : cadenas, disques, clavecin.',
+      },
       prologue: [
         'Alexandrine gardait la grande bibliothèque. Augustin dessinait des cartes de pays où elle n’irait jamais. Pendant onze ans, ils ont vécu loin l’un de l’autre, et ils se sont écrit.',
         'Pour que personne d’autre ne lise leurs lettres, elle les a cachées ici, derrière des mécanismes qui ne s’ouvrent qu’à deux voix.',
@@ -64,18 +66,23 @@
     },
     2: {
       chapter: 'Voiture', chapterAll: 'Voitures',
+      roles: { A: 'La Vigie', B: 'Le Télégraphiste' },
+      roleDesc: {
+        A: 'Tu vois ce que l’autre ne voit pas : tableaux, lanternes, plans. Tu décris.',
+        B: 'Tu tiens ce qui s’ouvre : billets, codes, loquets. Tu écoutes, puis tu tranches.',
+      },
       prologue: [
         'Il est rentré au printemps. Elle lui a dit qu’il était en retard. Et pour la première fois en onze ans, ils sont partis ensemble : deux billets sur le Nocturne, le train de nuit qui traverse l’Europe.',
         'Mais Alexandrine n’a jamais rien offert sans le verrouiller. Elle a laissé dans chaque voiture une épreuve pour Augustin. Puis, un soir, elle les a laissées pour d’autres.',
         'Ce soir, le train part. Sur la banquette, un télégramme vous attend :',
       ],
-      note: 'Asseyez-vous dos à dos. Ne vous retournez pas, sauf quand une carte vous l’ordonne. Vous avez toute la nuit. Elle passe vite, vous verrez.',
+      note: 'Asseyez-vous l’un à côté de l’autre, chacun son écran. Une seule règle : on ne regarde pas celui de l’autre. Je vous fais confiance. Le contrôleur, beaucoup moins. Vous avez toute la nuit. Elle passe vite, vous verrez.',
       rules: (other) => [
-        ['Dos à dos, un téléphone chacun.', ` Ce que tu vois, ${other} ne doit pas le voir. Tout passe par la voix.`],
-        ['Après chaque voiture, deux cartes.', ' Une question, puis un geste. Le chrono s’arrête : prenez votre temps. Chaque carte peut être passée.'],
+        ['Côte à côte, un téléphone chacun.', ` Ce que tu vois, ${other} ne doit pas le voir. Promis, juré : les yeux sur ton écran, tout passe par la voix.`],
+        ['Après chaque voiture, un entracte.', ' Un télégramme, puis un geste à faire ensemble, et parfois une question ou une carte que l’un de vous a écrite. Tout s’affiche sur vos deux écrans en même temps : on passe à la suite quand vous avez appuyé tous les deux. Le chrono s’arrête, et chacun peut passer une carte.'],
         ['Les indices sont gratuits.', ' Sauf pour l’honneur : le contrôleur note qui les demande.'],
       ],
-      enter: 'Monter à bord',
+      enter: 'Promis, je ne regarde pas',
       ambience: 'Bruit du train',
       ambienceNote: 'Un seul téléphone suffit pour le bruit du train : vous êtes dans la même pièce.',
       lobbyHint: 'Montre ce code à l’autre, ou envoie-lui le lien.',
@@ -92,6 +99,8 @@
     },
   };
   const tome = () => TOMES[(state && state.volume) || 1];
+  const roleName = (r) => tome().roles[r];
+  const teases = () => TEASES.map((t, id) => ({ ...t, id })).filter((t) => !t.volume || t.volume === ((state && state.volume) || 1));
 
   const SYM = {
     moon: '<svg viewBox="0 0 48 48"><path d="M30 6a18 18 0 1 0 12 26A15 15 0 0 1 30 6z" fill="currentColor"/></svg>',
@@ -123,8 +132,9 @@
   let homeError = '', lastHtml = null, lastStepKey = '', lastEventRev = 0;
   let typed = '', wheelTurn = 0, scratch = emptyScratch();
   let nameDraft = load('ebib_name', ''), letterDraft = '', draftFor = '';
-  let reveal = null, notesOpen = false, teaseOpen = false, hintArmed = false, envelopeOpen = false, confirmQuit = false;
+  let reveal = null, surpriseOpen = false, notesOpen = false, teaseOpen = false, hintArmed = false, envelopeOpen = false, confirmQuit = false;
   let introSeen = false, ambienceOn = load('ebib_ambience', false);
+  let cardDraft = '', surpriseDraft = '', lastInterlude = '';
   let spicyDraft = false, lampRun = 0, lampLit = false, lampPlaying = false, cardTimer = null;
   let audioCtx = null, ambience = null, whiteNoise = null;
   let profileT, hintT, toastT, pollT;
@@ -138,7 +148,7 @@
   const fmt = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
   const plural = (n, word) => `${n} ${word}${n > 1 ? 's' : ''}`;
   const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
-  const nameOf = (r) => (state ? state.names[r] : ROLE_NAME[r]);
+  const nameOf = (r) => (state ? state.names[r] : roleName(r));
   const otherOf = (r) => (r === 'A' ? 'B' : 'A');
   const fill = (tpl, map) => tpl.replace(/\{(\w+)\}/g, (_, k) => map[k]);
 
@@ -222,16 +232,19 @@
     const prev = state;
     if (!prev || prev.code !== m.code) lastEventRev = m.rev;
     state = m; recv = Date.now();
+    const ik = m.interlude ? m.interlude.idx + ':' + m.interlude.stage : '';
+    if (ik !== lastInterlude) { lastInterlude = ik; stopCardTimer(); }
     if (draftFor !== m.code) {
       draftFor = m.code;
       if (m.myName) nameDraft = m.myName;
       letterDraft = m.myLetter || '';
       spicyDraft = !!m.mySpicy;
+      cardDraft = m.myCard || ''; surpriseDraft = m.mySurprise || '';
       introSeen = load('ebib_intro_' + m.code, false);
       if (nameDraft && !m.myName) act({ t: 'profile', name: nameDraft });
     }
     if (prev && prev.phase === 'done' && m.phase === 'lobby') {
-      letterDraft = ''; spicyDraft = false; envelopeOpen = false; reveal = null;
+      letterDraft = ''; spicyDraft = false; cardDraft = ''; surpriseDraft = ''; surpriseOpen = false; envelopeOpen = false; reveal = null;
       for (let i = 0; i < m.total; i++) store(scratchKey(m.code, i), null);
     }
     if (m.phase === 'playing' && m.puzzle) {
@@ -252,7 +265,7 @@
     else if (e.kind === 'wrong') {
       const lines = e.what === 'maze' ? WRONG_MAZE : e.what === 'grid' ? WRONG_GRID : e.guess ? WRONG_LINES : WRONG_MELODY;
       toast(fill(pickOne(lines), { name: nameOf(e.by), guess: e.guess }), true);
-      playThud(); shakeAnswer();
+      playThud(); shakeAnswer(); buzz([40, 60, 40]);
     } else if (e.kind === 'round') {
       if (e.agree) playPing(); else playThud();
     } else if (e.kind === 'quizfail') {
@@ -262,8 +275,10 @@
         reveal = { ...e, stage: e.finished ? 'door' : 'letter' };
         if (e.finished) { playDoor(); setTimeout(() => { if (reveal && reveal.stage === 'door') { reveal.stage = 'letter'; render(); } }, 3400); }
         else playChime();
+        buzz(90);
         render();
       };
+      if (state.volume === 2 && !e.finished) { playChime(); buzz(90); return; }
       state.volume === 1 && e.idx === 4 ? setTimeout(show, 650) : show();
     } else if (e.kind === 'start') playChime();
     else if (e.kind === 'tease') { if (e.from !== me) flyTease(e); }
@@ -406,7 +421,7 @@
         <button class="tomecard t2" data-act="create" data-volume="2" ${busy ? 'disabled' : ''}>
           <span class="tomeno">Tome II</span>
           <b>Le Train de Nuit</b>
-          <span class="tomewhere">Dans la même pièce, dos à dos</span>
+          <span class="tomewhere">Côte à côte, chacun son écran</span>
           <span class="tomedesc">La suite de leur histoire : sept voitures, des questions qui comptent et des cartes à oser.</span>
         </button>
       </div>
@@ -438,25 +453,26 @@
       </header>
       <div class="players">
         <div class="pl me">
-          <div class="who">${ROLE_NAME[me]}</div>
+          <div class="who">${roleName(me)}</div>
           <div class="pname">${esc(nameDraft || 'Toi')}</div>
           <div class="st on">${s.ready ? 'Devant la porte' : 'C’est toi'}</div>
         </div>
         <div class="pl ${s.partner ? '' : 'away'}">
-          <div class="who">${ROLE_NAME[other]}</div>
-          <div class="pname">${s.partner ? esc(s.names[other] === ROLE_NAME[other] ? 'L’autre' : s.names[other]) : '…'}</div>
+          <div class="who">${roleName(other)}</div>
+          <div class="pname">${s.partner ? esc(s.names[other] === roleName(other) ? 'L’autre' : s.names[other]) : '…'}</div>
           <div class="st ${s.partner ? 'on' : ''}">${s.partner ? (s.partnerReady ? 'N’attend plus que toi' : 'Dans la salle') : 'Pas encore là'}</div>
         </div>
       </div>
-      <p class="roledesc">${ROLE_DESC[me]}${s.partner ? ' <button class="linkbtn" data-act="swap">Échanger les rôles</button>' : ''}</p>
+      <p class="roledesc">${tome().roleDesc[me]}${s.partner ? ' <button class="linkbtn" data-act="swap">Échanger les rôles</button>' : ''}</p>
       <div class="card form">
         <label for="pname">Ton prénom <span>(ou le surnom que l’autre va détester)</span></label>
         <input id="pname" class="field" maxlength="24" autocomplete="off" placeholder="Comment t’appeler ?" value="${esc(nameDraft)}">
         <label for="pletter">${tome().letterLabel} <span>(facultatif, mais ça se verra)</span></label>
         <textarea id="pletter" class="field" maxlength="800" rows="3" placeholder="${tome().letterHolder}">${esc(letterDraft)}</textarea>
+        ${s.volume === 2 ? trainFields(s, other) : ''}
         ${s.volume === 2 ? `<label class="spicy" for="pspicy">
           <input type="checkbox" id="pspicy" ${spicyDraft ? 'checked' : ''}>
-          <span><b>Entractes osés</b> J’ai 18 ans ou plus, et je dis oui. Il faut vos deux oui, sinon les cartes restent tendres. Le jeu n’affiche jamais le choix de l’autre, et chaque carte peut être passée sans explication.</span>
+          <span><b>Entractes osés</b> J’ai 18 ans ou plus, et je dis oui. Si vous cochez tous les deux : un geste osé après chaque voiture, avec deux gestes tendres pour commencer en douceur. Sinon : uniquement des gestes tendres. Le jeu n’affiche jamais le choix de l’autre, et chaque carte peut être passée sans explication.</span>
         </label>` : ''}
       </div>
       <div class="row">
@@ -465,6 +481,14 @@
       ${s.partner ? '<div class="row"><button class="linkbtn" data-act="invite">Copier le lien d’invitation</button></div>' : ''}
       <div class="row"><button class="linkbtn dim" data-act="quit">Quitter cette salle</button></div>
     </main>`;
+  }
+
+  function trainFields(s, other) {
+    const them = esc(s.partner && s.names[other] !== roleName(other) ? s.names[other] : 'l’autre');
+    const when = s.role === 'A' ? 'III' : 'V';
+    return `<label for="pcard">Ta carte pour ${them} <span>(facultatif)</span></label>
+        <textarea id="pcard" class="field" maxlength="300" rows="3" placeholder="Une question à lui poser, ou un geste à lui demander. Exemple : « Raconte-moi la première fois que tu as pensé à moi. »">${esc(cardDraft)}</textarea>
+        <p class="fieldnote">Elle s’affichera sur vos deux écrans après la voiture ${when}, signée de ton prénom.</p>`;
   }
 
   function viewIntro() {
@@ -532,7 +556,7 @@
   function teaseMenu() {
     return `<div class="teasemenu" data-key="tease">
       <p class="eyebrow">Envoyer à ${esc(nameOf(otherOf(state.role)))}</p>
-      ${TEASES.map((t, i) => `<button class="teasebtn ${t.heart ? 'love' : ''}" data-act="tease" data-id="${i}">${esc(t.text)}</button>`).join('')}
+      ${teases().map((t) => `<button class="teasebtn ${t.heart ? 'love' : ''}" data-act="tease" data-id="${t.id}">${esc(t.text)}</button>`).join('')}
     </div>`;
   }
 
@@ -582,8 +606,8 @@
         for (const sign of letter) {
           if (run !== lampRun) return;
           const dur = sign === '.' ? 320 : 960;
+          // Pas de son : côte à côte, l'autre entendrait le code. Seule la lumière (et la vibration) parle.
           lampLit = true; render();
-          tone(620, dur / 1000, 'sine', 0.05);
           if (navigator.vibrate) navigator.vibrate(dur);
           await wait(dur);
           lampLit = false; render();
@@ -744,40 +768,75 @@
     return `<div class="notebook" data-key="notes"><div class="nh"><span>Ton carnet (privé)</span><button data-act="notes" aria-label="Fermer le carnet">×</button></div><textarea id="notes" placeholder="Les lettres épelées, les dates, les insultes…">${esc(v)}</textarea></div>`;
   }
 
-  function viewReveal() {
-    const r = reveal;
+  // Tome II : l'entracte vit sur le serveur, pour que les deux écrans montrent la même carte.
+  function sharedReveal() {
+    const it = state.interlude;
+    return { sync: true, idx: it.idx, title: it.title, page: it.page, seal: it.seal, stage: it.stage === 0 ? 'letter' : 'card', card: it.stage - 1, total: it.total, current: it.card, meReady: it.meReady, theyReady: it.theyReady };
+  }
+  function syncButton(r, label) {
+    const other = esc(nameOf(otherOf(state.role)));
+    if (r.meReady) return `<button class="btn" disabled>On attend ${other}…</button>`;
+    return `<button class="btn" data-act="turn">${label}</button>${r.theyReady ? `<p class="legend waitnote">${other} a déjà appuyé.</p>` : ''}`;
+  }
+
+  function viewReveal(r) {
     if (r.stage === 'door') {
       return `<div class="doors" data-key="doors"><div class="glow"></div><div class="leaf l"><i></i></div><div class="leaf r"><i></i></div><div class="doorword">${esc(state.finalWord || 'REVOIR')}</div></div>`;
     }
     if (r.stage === 'card') {
-      const c = r.cards[r.card];
-      const text = c.to ? fill(c.text, { x: nameOf(c.to), y: nameOf(otherOf(c.to)) }) : c.text;
-      const next = r.card < r.cards.length - 1;
+      const c = r.sync ? r.current : r.cards[r.card];
+      const total = r.sync ? r.total : r.cards.length;
+      const text = c.kind === 'written' ? c.text : c.to ? fill(c.text, { x: nameOf(c.to), y: nameOf(otherOf(c.to)) }) : c.text;
+      const next = r.card < total - 1;
       const train = state.volume === 2;
       const countdown = c.secs
         ? `<div class="cardtimer">${cardTimer
           ? `<b>${cardTimer.left}</b><span>secondes</span>`
           : `<button class="btn ghost" data-act="cardtimer" data-secs="${c.secs}">Lancer la minute</button>`}</div>`
         : '';
-      return `<div class="modal" data-key="card-${r.idx}-${r.card}"><div class="sheet darecard ${c.kind}">
-        <p class="eyebrow">${c.kind === 'deep' ? 'À voix basse' : train ? 'Entracte' : 'Entracte · À voix haute'}</p>
+      const label = c.kind === 'written' ? `Carte de ${esc(nameOf(c.from))}, pour ${esc(nameOf(otherOf(c.from)))}` : c.kind === 'deep' ? 'Question · Réponds sincèrement' : !train ? 'Entracte · À voix haute' : c.heat === 'spicy' ? 'Geste · Osé' : 'Geste · Tendre';
+      const icon = c.kind === 'written' ? ICON.quill : c.kind === 'deep' ? SYM.moon : c.heat === 'spicy' ? ICON.fire : ICON.heart;
+      return `<div class="modal" data-key="card-${r.idx}-${r.card}"><div class="sheet darecard ${c.kind} ${c.heat ? 'heat-' + c.heat : ''}">
+        <div class="cardhead"><p class="eyebrow">${label}</p>${total > 1 ? `<span class="cardcount">${r.card + 1} / ${total}</span>` : ''}</div>
+        ${train ? `<div class="cardicon" aria-hidden="true">${icon}</div>` : ''}
         <p class="dare">${esc(text)}</p>
         ${countdown}
         <p class="legend">${tome().cardLegend}</p>
-        <button class="btn" data-act="${next ? 'nextcard' : 'closereveal'}">${next ? 'Carte suivante' : 'On continue'}</button>
-        ${train ? `<button class="linkbtn" data-act="${next ? 'nextcard' : 'closereveal'}" data-skip="1">On passe celle-là</button>` : ''}
+        ${r.sync ? syncButton(r, next ? 'Carte suivante' : 'On reprend le voyage') : `<button class="btn" data-act="${next ? 'nextcard' : 'closereveal'}">${next ? 'Carte suivante' : 'On continue'}</button>`}
+        ${train ? `<button class="linkbtn" data-act="${r.sync ? 'skipcard' : next ? 'nextcard' : 'closereveal'}">On passe celle-là</button>` : ''}
       </div></div>`;
     }
     const t = tome();
     const seal = r.seal ? `<div class="sealbox"><div class="bigseal">${esc(r.seal.letter)}${r.seal.number != null ? `<sup>${r.seal.number}</sup>` : ''}</div>
       <p class="sealmsg">${r.seal.number != null ? `Le numéro <b>${r.seal.number}</b> n’apparaît que chez toi. Garde-le, ou dis-le : à toi de voir.` : `Ce ${t.sealWord} a un numéro, mais c’est ${esc(nameOf(otherOf(state.role)))} qui l’a.`}</p></div>` : '';
-    const hasCards = r.cards && r.cards.length;
+    const hasCards = r.sync || (r.cards && r.cards.length);
+    const body = state.volume === 2
+      ? `<div class="letter telegram parchment"><div class="tghead"><b>Télégramme</b><span>Cie du Nocturne · Voiture ${ROMAN[r.idx]}</span></div><p class="hand">${typewriter(r.page.text)}</p><p class="sig">— ${esc(r.page.from)}</p></div>`
+      : `<div class="letter parchment"><p class="hand">${esc(r.page.text)}</p><p class="sig">— ${esc(r.page.from)}</p></div>`;
     return `<div class="modal" data-key="letter-${r.idx}"><div class="sheet letterwrap">
       <p class="eyebrow">${r.finished ? t.lastLetter : `${t.foundLetter} · ${esc(r.title)}`}</p>
-      <div class="letter parchment"><p class="hand">${esc(r.page.text)}</p><p class="sig">— ${esc(r.page.from)}</p></div>
+      ${body}
       ${seal}
-      <button class="btn" data-act="${hasCards ? 'toDare' : 'closereveal'}">${r.finished ? t.leaveBtn : 'Tourner la page'}</button>
+      ${r.sync ? syncButton(r, 'Voir la carte') : `<button class="btn" data-act="${hasCards ? 'toDare' : 'closereveal'}">${r.finished ? t.leaveBtn : 'Tourner la page'}</button>`}
     </div></div>`;
+  }
+
+  // Le télégramme s'imprime mot à mot. Les espaces fines sont posées avant le découpage,
+  // sinon la ponctuation haute se retrouverait seule en début de ligne.
+  function typewriter(text) {
+    const words = String(text).replace(/ ([:;?!»])/g, ' $1').replace(/« /g, '« ').split(' ');
+    return words.map((w, i) => `<span class="w" style="--w:${i}">${esc(w)}</span>`).join(' ');
+  }
+
+  function quizRecap() {
+    const log = state.quizLog || [];
+    if (!log.length) return '';
+    const n = state.names;
+    const misses = log.filter((l) => !l.agree).length;
+    const rows = log.map((l) => `<li class="${l.agree ? 'yes' : 'no'}"><b>${esc(l.q)}</b><span>${esc(n.A)} a voté ${esc(n[l.A])} · ${esc(n.B)} a voté ${esc(n[l.B])}</span></li>`).join('');
+    return `<details class="journal quizlog" open><summary>Les réponses au contrôleur · ${plural(misses, 'désaccord')}</summary>
+      <p class="qlintro">${misses ? 'Les désaccords sont en rouge. Vous avez la nuit pour régler ça.' : 'Aucun désaccord. Le contrôleur est jaloux.'}</p>
+      <ul>${rows}</ul></details>`;
   }
 
   function award(field, title, one, tie, none) {
@@ -813,6 +872,12 @@
         <h2>${t.letterFrom} ${esc(s.names[other])}</h2>
         ${envelopeOpen ? letterBody : `<button class="envelope" data-act="openenvelope" aria-label="${t.openLabel}"><span class="flap"></span><span class="wax">${esc((s.names[other] || 'A')[0].toUpperCase())}</span><em>${t.openLabel}</em></button>`}
       </section>
+      ${s.theirSurprise ? `<section class="surprise">
+        <h2>${esc(s.names[other])} a caché quelque chose pour toi</h2>
+        ${surpriseOpen
+    ? `<div class="letter telegram parchment opened"><div class="tghead"><b>Surprise</b><span>De la part de ${esc(s.names[other])}</span></div><p class="hand keep">${esc(s.theirSurprise)}</p></div>`
+    : '<button class="btn big" data-act="opensurprise">Découvrir où chercher</button>'}
+      </section>` : ''}
       <div class="stats">
         <div class="stat"><b>${fmt(s.elapsed)}</b><span>Temps</span></div>
         <div class="stat"><b>${hints}</b><span>${hints > 1 ? 'Indices' : 'Indice'}</span></div>
@@ -822,6 +887,7 @@
         <h2>${t.registry}</h2>
         ${awards.map((a) => `<div class="award"><b>${esc(a.title)}</b><span>${esc(a.text)}</span></div>`).join('')}
       </section>
+      ${quizRecap()}
       <details class="journal"><summary>${t.rereadLabel}</summary>
         ${s.journal.map((j) => `<div class="jl"><p>${esc(j.text)}</p><span>— ${esc(j.from)}</span></div>`).join('')}
       </details>
@@ -866,7 +932,19 @@
     else if (a.nodeName === 'INPUT' && document.activeElement !== a) a.value = b.getAttribute('value') || '';
   }
 
+  // Une partie dure plus d'une heure : l'écran ne doit pas s'éteindre pendant que l'autre parle.
+  let wakeLock = null, wakePending = false;
+  function keepAwake(on) {
+    if (!('wakeLock' in navigator) || wakePending) return;
+    if (on && !wakeLock && !document.hidden) {
+      wakePending = true;
+      navigator.wakeLock.request('screen').then((l) => { wakeLock = l; l.addEventListener('release', () => { wakeLock = null; }); }, () => {}).then(() => { wakePending = false; });
+    } else if (!on && wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+  }
+  const buzz = (p) => { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) {} };
+
   function render() {
+    keepAwake(!!state && state.phase === 'playing');
     document.body.dataset.phase = state ? state.phase : 'home';
     const volume = String((state && state.volume) || 1);
     if (document.body.dataset.volume !== volume) { document.body.dataset.volume = volume; if (volume === '2') paintTrainScene(); }
@@ -876,7 +954,8 @@
     else if (state.phase === 'playing') html = viewGame();
     else html = viewDone();
     if (state && state.phase === 'playing' && !introSeen) html += viewIntro();
-    if (reveal) html += viewReveal();
+    if (reveal) html += viewReveal(reveal);
+    else if (state && state.phase === 'playing' && state.interlude) html += viewReveal(sharedReveal());
     html = html.replace(/ ([:;?!»])/g, ' $1').replace(/« /g, '« ');
     if (html === lastHtml) return;
     lastHtml = html;
@@ -899,7 +978,7 @@
     homeError = '';
     enter({ t: 'join', code: c });
   }
-  function pushProfile() { clearTimeout(profileT); if (state && state.phase === 'lobby') act({ t: 'profile', name: nameDraft, letter: letterDraft, spicy: spicyDraft }); }
+  function pushProfile() { clearTimeout(profileT); if (state && state.phase === 'lobby') act({ t: 'profile', name: nameDraft, letter: letterDraft, spicy: spicyDraft, card: cardDraft, surprise: surpriseDraft }); }
   function copy(text, msg) {
     const done = () => toast(msg);
     const fallback = () => { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) {} ta.remove(); };
@@ -944,7 +1023,7 @@
     switch (b.dataset.act) {
       case 'create': homeError = ''; enter({ t: 'create', volume: Number(b.dataset.volume) || 1 }); break;
       case 'join': tryJoin(document.getElementById('joincode').value); break;
-      case 'ready': clearTimeout(profileT); store('ebib_name', nameDraft); act({ t: 'ready', value: !state.ready, name: nameDraft, letter: letterDraft, spicy: spicyDraft }); break;
+      case 'ready': clearTimeout(profileT); store('ebib_name', nameDraft); act({ t: 'ready', value: !state.ready, name: nameDraft, letter: letterDraft, spicy: spicyDraft, card: cardDraft, surprise: surpriseDraft }); break;
       case 'swap': act({ t: 'swap' }); break;
       case 'invite': invite(); break;
       case 'closeintro': introSeen = true; store('ebib_intro_' + state.code, true); playPage(); render(); break;
@@ -963,6 +1042,8 @@
       case 'toDare': reveal.stage = 'card'; reveal.card = 0; playPage(); render(); break;
       case 'nextcard': stopCardTimer(); reveal.card++; playPage(); render(); break;
       case 'closereveal': stopCardTimer(); reveal = null; if (state.paused) act({ t: 'resume' }); playPage(); render(); break;
+      case 'turn': act({ t: 'turn' }); playPage(); break;
+      case 'skipcard': stopCardTimer(); act({ t: 'skip' }); playPage(); break;
       case 'cardtimer': startCardTimer(Number(b.dataset.secs)); break;
       case 'lamp': if (!lampPlaying) playLamp(); break;
       case 'move': moveToken(b.dataset.dir); break;
@@ -973,6 +1054,7 @@
         act({ t: 'submit', answer });
         break;
       }
+      case 'opensurprise': surpriseOpen = true; playChime(); hearts(); buzz(120); render(); break;
       case 'openenvelope': envelopeOpen = true; playThud(); playChime(); hearts(); render(); break;
       case 'restart': act({ t: 'restart' }); break;
       case 'share': copy(b.dataset.text, 'Score copié'); break;
@@ -1016,13 +1098,16 @@
     } else if (t.id === 'pspicy') {
       spicyDraft = t.checked;
       pushProfile();
+    } else if (t.id === 'pcard' || t.id === 'psurprise') {
+      if (t.id === 'pcard') cardDraft = t.value; else surpriseDraft = t.value;
+      clearTimeout(profileT); profileT = setTimeout(pushProfile, 700);
     } else if (t.id === 'pname' || t.id === 'pletter') {
       if (t.id === 'pname') { nameDraft = t.value; store('ebib_name', nameDraft); } else letterDraft = t.value;
       clearTimeout(profileT); profileT = setTimeout(pushProfile, 700);
       render();
     }
   });
-  $app.addEventListener('focusout', (e) => { if (e.target.id === 'pname' || e.target.id === 'pletter') pushProfile(); });
+  $app.addEventListener('focusout', (e) => { if (['pname', 'pletter', 'pcard', 'psurprise'].includes(e.target.id)) pushProfile(); });
   $app.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       if (e.target.id === 'answer') submitAnswer();

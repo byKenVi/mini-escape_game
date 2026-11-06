@@ -142,8 +142,9 @@ test('tome II : les entractes osés demandent l’accord des deux, sans révéle
   const seenByA = JSON.stringify(G.snapshot(refused, 'A'));
   assert.ok(!seenByA.includes('"spicy"'), 'le choix de l’autre ne part jamais au navigateur');
   for (let i = 0; i < 6; i++) {
-    assert.deepStrictEqual(T.cardsFor(i, false).map((c) => c.kind), ['deep', 'act']);
-    assert.notStrictEqual(T.cardsFor(i, true)[1].text, T.cardsFor(i, false)[1].text);
+    assert.deepStrictEqual(T.cardsFor(i, false).map((c) => c.heat || c.kind), i === 3 || i === 5 ? ['deep', 'tender'] : ['tender']);
+    assert.strictEqual(T.cardsFor(i, true).at(-1).heat, 'spicy', 'en mode osé, chaque voiture finit sur un geste osé');
+    assert.notStrictEqual(T.cardsFor(i, true).at(-1).text, T.cardsFor(i, false).at(-1).text);
   }
 });
 
@@ -194,6 +195,34 @@ test('tome II : le contrôleur compte les accords et repose d’autres questions
   assert.strictEqual(room.step, 3);
   for (let i = 0; i < 4; i++) { tick(room, 'A', { t: 'vote', who: 'A' }); tick(room, 'B', { t: 'vote', who: 'A' }); }
   assert.strictEqual(room.step, 4);
+  assert.strictEqual(room.quizLog.length, 7, 'chaque question tranchée est notée');
+  assert.deepStrictEqual(room.quizLog.map((l) => l.agree), [false, false, false, true, true, true, true]);
+  assert.strictEqual(G.snapshot(room, 'A').quizLog, null, 'le carnet ne s’ouvre qu’à l’arrivée');
+  room.phase = 'done';
+  assert.strictEqual(G.snapshot(room, 'B').quizLog.length, 7);
+});
+
+test('tome II : les rôles ont leurs propres noms, et les gestes disent s’ils sont osés', () => {
+  const room = startedTrain(false, false);
+  room.players.B.name = '';
+  assert.strictEqual(G.snapshot(room, 'A').names.B, 'Le Télégraphiste');
+  assert.strictEqual(G.snapshot(startedRoom(), 'A').names.B, 'Cartographe');
+  assert.strictEqual(T.cardsFor(0, true).at(-1).heat, 'spicy');
+  assert.strictEqual(T.cardsFor(0, false)[0].heat, 'tender');
+});
+
+test('tome II : en mode osé, surtout de l’osé, un peu de tendre pour s’échauffer, deux questions', () => {
+  const all = [0, 1, 2, 3, 4, 5].flatMap((i) => T.cardsFor(i, true));
+  const count = (f) => all.filter(f).length;
+  assert.strictEqual(count((c) => c.heat === 'spicy'), 6);
+  assert.strictEqual(count((c) => c.heat === 'tender'), 2);
+  assert.strictEqual(count((c) => c.kind === 'deep'), 2);
+  assert.ok(!/slow|danse/i.test(JSON.stringify(all.concat([0, 1, 2, 3, 4, 5].flatMap((i) => T.cardsFor(i, false))))));
+});
+
+test('tome II : plus aucune consigne ne demande de se mettre dos à dos', () => {
+  const texts = JSON.stringify([T.buildAll(), [0, 1, 2, 3, 4, 5].map((i) => [T.cardsFor(i, true), T.cardsFor(i, false)])]);
+  assert.ok(!/dos à dos|retourne-toi|retournez-vous|vous retourner/i.test(texts));
 });
 
 test('tome II : le vitrail se reproduit en miroir et seul B le valide', () => {
@@ -230,21 +259,61 @@ test('tome II : partie complète, le chrono s’arrête pendant les entractes', 
     if (i < 6) {
       assert.ok(room.pausedAt > 0, 'pause pendant l’entracte');
       assert.strictEqual(G.snapshot(room, 'A').paused, true);
-      tick(room, 'A', { t: 'resume' });
+      while (room.interlude) { tick(room, 'A', { t: 'turn' }); tick(room, 'B', { t: 'turn' }); }
       assert.strictEqual(room.pausedAt, 0);
-      assert.strictEqual(tick(room, 'B', { t: 'resume' }), false, 'le deuxième ne change rien');
+      assert.strictEqual(tick(room, 'B', { t: 'turn' }), false, 'plus rien à tourner');
     }
   }
   assert.strictEqual(room.phase, 'done');
   assert.strictEqual(G.snapshot(room, 'B').finalWord, 'RESTER');
 });
 
-test('tome II : si la reprise se perd, la première action relance le chrono', () => {
+test('tome II : l’entracte avance quand les deux ont appuyé, et chacun peut passer une carte seul', () => {
   const room = startedTrain(false, false);
   tick(room, 'A', { t: 'submit', answer: room.puzzles[0].answer });
-  assert.ok(room.pausedAt > 0);
+  assert.strictEqual(G.snapshot(room, 'A').interlude.stage, 0, 'd’abord le télégramme');
+  assert.strictEqual(tick(room, 'A', { t: 'skip' }), false, 'on ne passe pas le télégramme');
+  tick(room, 'A', { t: 'turn' });
+  assert.strictEqual(room.interlude.stage, 0, 'on attend l’autre');
+  assert.strictEqual(G.snapshot(room, 'B').interlude.theyReady, true);
+  assert.strictEqual(tick(room, 'A', { t: 'turn' }), false, 'appuyer deux fois ne compte pas');
   tick(room, 'B', { t: 'hint' });
+  assert.ok(room.pausedAt > 0, 'une autre action ne relance pas le chrono pendant l’entracte');
+  tick(room, 'B', { t: 'turn' });
+  assert.strictEqual(G.snapshot(room, 'B').interlude.card.kind, 'act');
+  tick(room, 'B', { t: 'skip' });
+  assert.strictEqual(room.interlude, null, 'une seule personne suffit pour passer');
   assert.strictEqual(room.pausedAt, 0);
+});
+
+test('tome II : les cartes écrites arrivent après les voitures III et V, la surprise seulement à la fin', () => {
+  const room = G.createRoom('TEST', 2);
+  G.join(room, null);
+  tick(room, 'A', { t: 'ready', value: true, card: 'Raconte-moi ton plus beau souvenir de nous.', surprise: 'Regarde sous le coussin bleu.' });
+  tick(room, 'B', { t: 'ready', value: true, card: 'Chante-moi le refrain de ta chanson préférée.' });
+  assert.strictEqual(room.phase, 'playing');
+  assert.ok(!JSON.stringify(G.snapshot(room, 'B')).includes('coussin'), 'la surprise reste cachée');
+  room.step = 2;
+  tick(room, 'A', { t: 'submit', answer: 'faux' });
+  room.puzzles[2] = { ...room.puzzles[0], answer: 'OK' };
+  tick(room, 'A', { t: 'submit', answer: 'OK' });
+  assert.deepStrictEqual(room.interlude.cards.map((c) => c.kind), ['written', 'act']);
+  assert.strictEqual(room.interlude.cards[0].from, 'A');
+  room.interlude = null; room.pausedAt = 0;
+  room.step = 4;
+  room.puzzles[4] = { ...room.puzzles[0], input: { kind: 'digits' }, answer: 'OK' };
+  tick(room, 'A', { t: 'submit', answer: 'OK' });
+  assert.match(room.interlude.cards[0].text, /refrain/);
+  room.phase = 'done';
+  assert.strictEqual(G.snapshot(room, 'B').theirSurprise, 'Regarde sous le coussin bleu.');
+  assert.strictEqual(G.snapshot(room, 'A').theirSurprise, '');
+});
+
+test('tome II : le contrôleur va du plus léger au plus intime', () => {
+  const qs = T.newQuestions();
+  assert.strictEqual(qs.length, T.QUIZ_LENGTH);
+  assert.ok(qs.slice(0, 2).every((q) => T.QUESTIONS.light.includes(q)));
+  assert.ok(qs.slice(4).every((q) => T.QUESTIONS.close.includes(q)));
 });
 
 test('aucune réponse du tome II dans ce que reçoit un joueur', () => {

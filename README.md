@@ -3,7 +3,7 @@
 Escape game coopératif à deux. Chaque joueur voit un écran différent : il faut décrire, écouter, et se taquiner. En chemin, les joueurs retrouvent les lettres qu'Alexandrine et Augustin se sont écrites.
 
 - **Tome I, La Bibliothèque** : à distance, en appel.
-- **Tome II, Le Train de Nuit** : dans la même pièce, dos à dos. Après chaque voiture, une question et un geste. Les gestes osés ne s'activent que si les deux joueurs majeurs disent oui, et chaque carte peut être passée.
+- **Tome II, Le Train de Nuit** : côte à côte, un téléphone chacun, en promettant de ne pas regarder l'écran de l'autre. Après chaque voiture, un entracte partagé sur les deux écrans : un télégramme, un geste osé si les deux joueurs majeurs disent oui (avec deux gestes tendres pour s'échauffer), sinon un geste tendre, parfois une question ou une carte écrite par l'un des joueurs dans le salon. On avance quand les deux ont appuyé ; chacun peut passer une carte seul.
 
 ## Lancer en local
     npm start        # http://localhost:3000
