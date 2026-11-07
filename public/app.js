@@ -80,7 +80,7 @@
       rules: (other) => [
         ['Côte à côte, un téléphone chacun.', ` Ce que tu vois, ${other} ne doit pas le voir. Promis, juré : les yeux sur ton écran, tout passe par la voix.`],
         ['Après chaque voiture, un entracte.', ' Un télégramme, puis un geste à faire ensemble, et parfois une question ou une carte que l’un de vous a écrite. Tout s’affiche sur vos deux écrans en même temps : on passe à la suite quand vous avez appuyé tous les deux. Le chrono s’arrête, et chacun peut passer une carte.'],
-        ['Les indices sont gratuits.', ' Sauf pour l’honneur : le contrôleur note qui les demande.'],
+        ['Trois indices par énigme, puis la réponse.', ' Les indices sont gratuits. Si vous bloquez encore, le bouton « Réponse » vous la donne, en échange d’un gage.'],
       ],
       enter: 'Promis, je ne regarde pas',
       ambience: 'Bruit du train',
@@ -282,7 +282,14 @@
       state.volume === 1 && e.idx === 4 ? setTimeout(show, 650) : show();
     } else if (e.kind === 'start') playChime();
     else if (e.kind === 'tease') { if (e.from !== me) flyTease(e); }
-    else if (e.kind === 'hint') {
+    else if (e.kind === 'gage') {
+      toast(e.by === me ? 'Le contrôleur veut un gage avant de donner la réponse.' : `${nameOf(e.by)} a craqué : un gage vous attend.`);
+      playPing(); buzz(60);
+      setTimeout(() => { const g = document.querySelector('.gagebox'); if (g) g.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
+    } else if (e.kind === 'revealed') {
+      playChime();
+      setTimeout(() => { const g = document.querySelector('.gagebox'); if (g) g.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
+    } else if (e.kind === 'hint') {
       if (e.by !== me) toast(`${nameOf(e.by)} a craqué : un indice vient de tomber.`);
       setTimeout(() => { const list = document.querySelectorAll('.hint'); if (list.length) list[list.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 120);
     }
@@ -539,18 +546,35 @@
           ${viewInput(p)}
         </div>
         <div class="hints">${p.hints.map((h, i) => `<div class="hint"><b>Indice ${i + 1}</b>${esc(h)}</div>`).join('')}</div>
+        ${p.canAsk && p.hints.length === p.hintsMax && !p.gage ? `<p class="legend askhint">Toujours bloqués ? Le bouton ${p.passOnGage ? '« Passer »' : '« Réponse »'}, en bas, ${p.passOnGage ? 'vous fait passer' : 'vous donne la réponse'} contre un gage.</p>` : ''}
+        ${p.gage ? gageBox(p) : ''}
       </section>
       <div class="row quitrow">${confirmQuit
     ? `<span class="legend">Tu ne pourras plus revenir dans cette salle.</span><button class="linkbtn" data-act="quitconfirm">Quitter quand même</button><button class="linkbtn" data-act="quitcancel">Rester</button>`
     : '<button class="linkbtn dim" data-act="quit">Quitter la partie</button>'}</div>
     </main>
     <nav class="dock" aria-label="Outils">
-      <button class="dockbtn ${hintArmed ? 'armed' : ''}" data-act="hint" ${remaining > 0 ? '' : 'disabled'}>${ICON.bulb}<span>${hintArmed ? 'Vraiment ?' : remaining > 0 ? `Indice (${remaining})` : 'Plus d’indice'}</span></button>
+      ${remaining > 0 || !p.canAsk
+    ? `<button class="dockbtn ${hintArmed ? 'armed' : ''}" data-act="hint" ${remaining > 0 ? '' : 'disabled'}>${ICON.bulb}<span>${hintArmed ? 'Vraiment ?' : remaining > 0 ? `Indice (${remaining})` : 'Plus d’indice'}</span></button>`
+    : `<button class="dockbtn ${hintArmed ? 'armed' : ''} answerbtn" data-act="askanswer" ${p.gage ? 'disabled' : ''}>${ICON.fire}<span>${p.gage ? (p.gage.done ? 'Réponse donnée' : 'Gage en cours') : hintArmed ? 'Contre un gage ?' : p.passOnGage ? 'Passer' : 'Réponse'}</span></button>`}
       <button class="dockbtn ${notesOpen ? 'active' : ''}" data-act="notes" aria-expanded="${notesOpen}">${ICON.quill}<span>Carnet</span></button>
       <button class="dockbtn tease ${teaseOpen ? 'active' : ''}" data-act="teasemenu" aria-expanded="${teaseOpen}">${ICON.heart}<span>Taquiner</span></button>
     </nav>
     ${notesOpen ? notebook() : ''}
     ${teaseOpen ? teaseMenu() : ''}`;
+  }
+
+  function gageBox(p) {
+    const g = p.gage;
+    if (g.done) {
+      return g.reveal ? `<div class="gagebox done"><p class="eyebrow">Gage accompli · La réponse</p><p class="gagereveal">${esc(g.reveal)}</p></div>` : '';
+    }
+    const text = fill(g.text, { x: nameOf(g.by), y: nameOf(otherOf(g.by)) });
+    return `<div class="gagebox"><p class="eyebrow">Gage · ${p.passOnGage ? 'pour passer le contrôleur' : 'pour obtenir la réponse'}</p>
+      <div class="cardicon" aria-hidden="true">${ICON.fire}</div>
+      <p class="gagetext">${esc(text)}</p>
+      <button class="btn" data-act="gagedone">Gage accompli, ${p.passOnGage ? 'on passe' : 'la réponse'} !</button>
+      <button class="linkbtn" data-act="regage">Un autre gage</button></div>`;
   }
 
   function teaseMenu() {
@@ -858,6 +882,7 @@
       award('hints', 'L’humilité', '{name} a demandé {n} indice(s). C’est noté.', '{n} indice(s) de chaque côté. Personne n’a craqué seul.', 'Zéro indice. Quel orgueil.'),
       award('teases', 'L’insolence', '{name}, avec {n} message(s) envoyé(s) pendant que l’autre réfléchissait.', 'Égalité : {n} message(s) de chaque côté.', 'Personne n’a osé taquiner l’autre. Alexandrine est déçue.'),
     ];
+    if (s.volume === 2) awards.push(award('gages', 'L’audace', '{name} a payé {n} gage(s) pour obtenir une réponse. Le contrôleur a apprécié.', '{n} gage(s) chacun. Le contrôleur rougit encore.', 'Aucun gage. Le contrôleur est presque déçu.'));
     const letter = s.theirLetter;
     const letterBody = letter
       ? `<div class="letter parchment opened"><p class="hand keep">${esc(letter)}</p><p class="sig">— ${esc(s.names[other])}</p></div>`
@@ -1029,6 +1054,12 @@
       case 'closeintro': introSeen = true; store('ebib_intro_' + state.code, true); playPage(); render(); break;
       case 'ambience': toggleAmbience(); break;
       case 'submit': submitAnswer(); break;
+      case 'askanswer':
+        if (!hintArmed) { hintArmed = true; clearTimeout(hintT); hintT = setTimeout(() => { hintArmed = false; render(); }, 3500); render(); break; }
+        hintArmed = false; clearTimeout(hintT); act({ t: 'askanswer' }); render();
+        break;
+      case 'regage': act({ t: 'regage' }); playPage(); break;
+      case 'gagedone': act({ t: 'gagedone' }); break;
       case 'hint':
         if (!hintArmed) { hintArmed = true; clearTimeout(hintT); hintT = setTimeout(() => { hintArmed = false; render(); }, 3500); render(); break; }
         hintArmed = false; clearTimeout(hintT); act({ t: 'hint' }); render();

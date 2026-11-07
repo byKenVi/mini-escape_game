@@ -645,3 +645,15 @@ body[data-volume="2"] .darecard.written .cardicon,body[data-volume="2"] .darecar
 body[data-volume="2"] .darecard.written .dare{font-family:'Special Elite','Courier New',monospace;font-style:normal;font-size:clamp(20px,4.6vw,25px)}
 .surprise{display:grid;gap:12px;justify-items:center}
 .surprise .letter{width:100%}
+
+/* ---------- gage contre la réponse ---------- */
+.askhint{font-size:16px;margin-top:10px}
+.gagebox{margin-top:14px;display:grid;gap:12px;justify-items:center;text-align:center;padding:22px 20px;border-radius:4px;background:radial-gradient(120% 80% at 50% 0,#7a1426,#2a050e 72%);border:1px solid rgba(255,128,104,.6);box-shadow:0 18px 40px rgba(0,0,0,.6);animation:rise .4s ease both}
+.gagebox .eyebrow{color:#ff9f7e}
+.gagebox .cardicon{color:#ff9f7e;width:38px;height:38px}
+.gagetext{font-family:'Spectral',Georgia,serif;font-style:italic;font-size:clamp(21px,4.8vw,26px);line-height:1.28;color:#fff0e4}
+.gagebox .linkbtn{color:#f4ecd8;opacity:.8}
+.gagebox.done{background:linear-gradient(180deg,#16204f,#090e26);border-color:rgba(214,178,106,.6)}
+.gagebox.done .eyebrow{color:#e5c684}
+.gagereveal{font-family:'Special Elite','Courier New',monospace;font-size:clamp(18px,4.4vw,22px);line-height:1.45;color:#f0d999}
+.dockbtn.answerbtn svg{color:#ff9f7e}

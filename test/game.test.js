@@ -220,6 +220,36 @@ test('tome II : en mode osé, surtout de l’osé, un peu de tendre pour s’éc
   assert.ok(!/slow|danse/i.test(JSON.stringify(all.concat([0, 1, 2, 3, 4, 5].flatMap((i) => T.cardsFor(i, false))))));
 });
 
+test('tome II : trois indices, puis la réponse contre un gage', () => {
+  for (let k = 0; k < 20; k++) {
+    for (const p of T.buildAll()) assert.strictEqual(p.hints.length, 3, p.id);
+    const { maze } = T.buildAll()[2];
+    assert.strictEqual(T.solveMaze(maze).length, T.shortestPath(maze.open, maze.size, maze.start, maze.goal));
+  }
+  const room = startedTrain(true, true);
+  const inst = room.puzzles[0];
+  assert.strictEqual(tick(room, 'A', { t: 'askanswer' }), false, 'pas avant les trois indices');
+  for (let i = 0; i < 3; i++) tick(room, 'A', { t: 'hint' });
+  tick(room, 'B', { t: 'askanswer' });
+  const seen = G.snapshot(room, 'A').puzzle.gage;
+  assert.strictEqual(seen.by, 'B');
+  assert.ok(T.GAGES.spicy.includes(seen.text));
+  assert.strictEqual(seen.reveal, null, 'la réponse attend le gage');
+  assert.ok(!JSON.stringify(G.snapshot(room, 'A')).includes(inst.answer + ' '), 'aucune fuite');
+  tick(room, 'A', { t: 'regage' });
+  assert.notStrictEqual(G.snapshot(room, 'A').puzzle.gage.text, seen.text, 'un autre gage');
+  tick(room, 'A', { t: 'gagedone' });
+  assert.ok(G.snapshot(room, 'B').puzzle.gage.reveal.includes(inst.answer));
+  assert.strictEqual(room.stats.B.gages, 1);
+  const quiz = startedTrain(false, false);
+  quiz.step = 3;
+  for (let i = 0; i < 3; i++) tick(quiz, 'A', { t: 'hint' });
+  tick(quiz, 'A', { t: 'askanswer' });
+  assert.ok(T.GAGES.tender.includes(G.snapshot(quiz, 'A').puzzle.gage.text), 'gages tendres si l’osé est refusé');
+  tick(quiz, 'B', { t: 'gagedone' });
+  assert.strictEqual(quiz.step, 4, 'le gage fait passer le contrôleur');
+});
+
 test('tome II : plus aucune consigne ne demande de se mettre dos à dos', () => {
   const texts = JSON.stringify([T.buildAll(), [0, 1, 2, 3, 4, 5].map((i) => [T.cardsFor(i, true), T.cardsFor(i, false)])]);
   assert.ok(!/dos à dos|retourne-toi|retournez-vous|vous retourner/i.test(texts));
