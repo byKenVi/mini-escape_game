@@ -15,6 +15,7 @@
     { text: 'Je te garde quand même', heart: true },
     { text: 'Un bisou, pour la peine', heart: true },
     { text: 'Les yeux sur ton écran, tricheur', volume: 2 },
+    { text: 'Tu regardes au moins le bon ciel ?', volume: 3 },
   ];
   const WRONG_LINES = [
     '{name} propose « {guess} ». Le mécanisme ne daigne même pas bouger.',
@@ -29,10 +30,24 @@
     '{name} vient d’inventer un nouveau genre musical. On reprend.',
   ];
 
+  const WRONG_CRANK = [
+    'La coupole de {name} a tourné de travers. La fente regarde un mur.',
+    '{name} a actionné la manivelle. Augustin compte les dents en grimaçant.',
+    'Trop, pas assez, ou dans le mauvais sens : {name} a le choix.',
+  ];
+  const WRONG_SCOPE = [
+    'Plaque vierge : pas de comète là où {name} a pointé la lunette.',
+    '{name} vient de photographier un ciel parfaitement vide. Magnifique, mais vide.',
+  ];
+  const WRONG_ECLIPSE = {
+    early: ['{name} a déclenché trop tôt : la plaque montre un Soleil éclatant. On relance.', 'Trop tôt, {name}. La Lune n’était pas encore là.'],
+    late: ['{name} a déclenché trop tard : le Soleil était déjà revenu. On relance.', 'Trop tard, {name}. Le noir est passé sans toi.'],
+  };
+
   // Ce qui change d'un tome à l'autre, côté interface.
   const TOMES = {
     1: {
-      chapter: 'Chapitre', chapterAll: 'Chapitres',
+      chapter: 'Chapitre', chapterAll: 'Chapitres', lobbyTome: 'À distance · La Bibliothèque', sealThis: 'Ce sceau',
       roles: { A: 'L’Archiviste', B: 'Cartographe' },
       roleDesc: {
         A: 'Tu lis ce qui est écrit : grimoires, registres, partitions.',
@@ -65,7 +80,14 @@
       registry: 'Le registre d’Alexandrine', rereadLabel: 'Relire toutes leurs lettres',
     },
     2: {
-      chapter: 'Voiture', chapterAll: 'Voitures',
+      chapter: 'Voiture', chapterAll: 'Voitures', lobbyTome: 'Côte à côte · Le Train de Nuit', sealThis: 'Ce poinçon',
+      shared: true, after: 'la voiture', resume: 'On reprend le voyage',
+      pageHead: ['Télégramme', (idx) => `Cie du Nocturne · Voiture ${ROMAN[idx]}`],
+      heat: { spicy: 'Geste · Osé', tender: 'Geste · Tendre' },
+      spicyText: 'Coché par défaut : j’ai 18 ans ou plus, et je dis oui. Avec vos deux oui, vous aurez un geste osé après chaque voiture, et deux gestes tendres pour commencer en douceur. Tu préfères rester sur des gestes tendres ? Décoche la case : il suffit qu’un seul de vous deux décoche pour que toute la partie soit tendre. Le jeu n’affiche jamais le choix de l’autre, et chaque carte peut être passée sans explication.',
+      consent: 'Dans le train, les entractes osés sont des gestes physiques et audacieux, à faire côte à côte : baisers, caresses, vêtements retirés.',
+      gageMine: 'Le contrôleur veut un gage avant de donner la réponse.', passWhat: 'pour passer le contrôleur',
+      gageAward: ['{name} a payé {n} gage(s) pour obtenir une réponse. Le contrôleur a apprécié.', '{n} gage(s) chacun. Le contrôleur rougit encore.', 'Aucun gage. Le contrôleur est presque déçu.'],
       roles: { A: 'La Vigie', B: 'Le Télégraphiste' },
       roleDesc: {
         A: 'Tu vois ce que l’autre ne voit pas : tableaux, lanternes, plans. Tu décris.',
@@ -97,6 +119,46 @@
       cardLegend: 'Le chrono est arrêté. Le train, lui, continue.',
       registry: 'Le carnet du contrôleur', rereadLabel: 'Relire tous leurs télégrammes',
     },
+    3: {
+      chapter: 'Nuit', chapterAll: 'Nuits', lobbyTome: 'À distance · L’Observatoire', sealThis: 'Cet éclat',
+      shared: true, after: 'la nuit', resume: 'Retour à la lunette',
+      pageHead: ['Lettre', (idx) => `Observatoire · Nuit ${ROMAN[idx]}`],
+      heat: { spicy: 'Carte · Osée', tender: 'Carte · Tendre' },
+      spicyText: 'Coché par défaut : j’ai 18 ans ou plus et je dis oui. Si vous dites oui tous les deux, deux cartes un peu plus coquines s’ajoutent à la partie, à jouer à la voix. Si l’un de vous décoche, elles disparaissent. Le jeu ne montre jamais le choix de l’autre, et toutes les cartes peuvent être passées.',
+      consent: 'Dans ce niveau, ça reste léger : deux cartes un peu coquines dans toute la partie, à jouer à la voix. Rien à montrer, rien à retirer, en appel simple comme en vidéo.',
+      gageMine: 'Augustin veut un gage avant de donner la réponse.', passWhat: 'pour passer l’éclipse',
+      gageAward: ['{name} a payé {n} gage(s) pour obtenir une réponse. Augustin a tout noté.', '{n} gage(s) chacun. Augustin a cassé sa plume.', 'Aucun gage. Augustin est presque déçu.'],
+      roles: { A: 'L’Astronome', B: 'Le Machiniste' },
+      roleDesc: {
+        A: 'Tu as l’œil à la lunette et les cartes du ciel. Tu vois, tu décris.',
+        B: 'Tu as les molettes, la manivelle et l’obturateur. Tu écoutes, puis tu manœuvres.',
+      },
+      prologue: [
+        'Avant le train, il y a eu onze ans. Augustin était parti dresser la carte du ciel austral, dans un observatoire perché au bout du monde. Alexandrine gardait sa bibliothèque, de l’autre côté de la Terre.',
+        'Ils s’étaient fait une seule promesse : chaque soir, à la même heure, lever les yeux vers la même étoile. Augustin a tout noté, nuit après nuit, et il a enfermé ses carnets dans la mécanique de sa coupole.',
+        'Ce soir, vous êtes chacun dans un observatoire, loin l’un de l’autre. Près de la lunette, un mot vous attend :',
+      ],
+      note: 'Vous êtes loin, et vous vous entendez : c’est déjà plus que ce que nous avions. Ma coupole ne s’ouvre qu’à deux. L’un regarde, l’autre manœuvre. Vous avez jusqu’au lever du jour. Et quand vous aurez fini, sortez voir le ciel. C’est le même.',
+      rules: (other) => [
+        ['Chacun chez soi, en appel.', ` Ce que tu vois, ${other} ne le voit pas. Tout passe par la voix.`],
+        ['Après chaque nuit, un entracte.', ' Une lettre, puis des cartes pour mieux vous connaître et pour rire, sur vos deux écrans en même temps. On avance quand vous avez appuyé tous les deux. Le chrono s’arrête, et chacun peut passer une carte.'],
+        ['Trois indices par énigme, puis la réponse.', ' Les indices sont gratuits. Si vous bloquez encore, le bouton « Réponse » vous la donne, en échange d’un gage.'],
+      ],
+      enter: 'Ouvrir la coupole',
+      ambience: 'Nuit d’été',
+      ambienceNote: 'Pour les grillons et l’horloge de la coupole, un casque évite que l’autre les entende dans l’appel.',
+      lobbyHint: 'Envoie le lien, lance l’appel, et attends ici.',
+      invite: 'Deux observatoires, un seul ciel, et une coupole qui ne s’ouvre qu’à deux. Appelle-moi et viens :',
+      letterLabel: 'Une lettre pour l’aube',
+      letterHolder: 'Écris quelque chose à l’autre. Augustin la range dans son carnet : elle ne s’ouvrira qu’une fois la coupole ouverte.',
+      sealWord: 'éclat', sealsWord: 'éclats',
+      lastLetter: 'Dernière page du carnet', foundLetter: 'Page retrouvée', leaveBtn: 'Sortir sous les étoiles',
+      letterFrom: 'La lettre de', openLabel: 'Ouvrir la lettre',
+      outEyebrow: 'La coupole est ouverte', outTitle: 'Le même ciel', outStory: 'Onze ans, la même étoile, chaque soir. Puis un printemps, il est rentré. Ce soir, levez les yeux : c’est la même pour vous deux.',
+      replay: 'Rouvrir la coupole, avec de nouveaux réglages', shareName: 'l’Observatoire d’Augustin',
+      cardLegend: 'Le chrono est arrêté. Le ciel, lui, continue de tourner.',
+      registry: 'Le carnet d’Augustin', rereadLabel: 'Relire toutes leurs lettres',
+    },
   };
   const tome = () => TOMES[(state && state.volume) || 1];
   const roleName = (r) => tome().roles[r];
@@ -123,7 +185,11 @@
     quill: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4c-7 0-12 4-13 11l-2 5M7 15c5 0 10-3 13-11M9 12h4"/></svg>',
     heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8.5-5.2-8.5-11.3A4.7 4.7 0 0 1 12 7a4.7 4.7 0 0 1 8.5 2.7C20.5 15.8 12 21 12 21z"/></svg>',
     fire: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 4 5 5.5 5 10.5a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9.5z"/></svg>',
+    phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/><path d="M15 3a6 6 0 0 1 6 6M15 7a2 2 0 0 1 2 2"/></svg>',
+    couple: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="7" r="3"/><circle cx="16" cy="7" r="3"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0M10.5 20a5.5 5.5 0 0 1 11 0"/></svg>',
+    moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/><path d="M17 3v3M15.5 4.5h3"/></svg>',
   };
+  const ambIcon = () => (state && state.volume === 3 ? ICON.moon : ICON.fire);
   const CREST = '<svg class="crest" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 14c8-3 16-3 24 2 8-5 16-5 24-2v36c-8-3-16-3-24 2-8-5-16-5-24-2z"/><path d="M32 16v36"/><circle cx="46" cy="30" r="4"/><path d="M46 34v8m0-3h3m-3 3h3"/></svg>';
 
   /* ---------- état ---------- */
@@ -136,6 +202,8 @@
   let introSeen = false, ambienceOn = load('ebib_ambience', false);
   let cardDraft = '', surpriseDraft = '', lastInterlude = '';
   let spicyDraft = true, lampRun = 0, lampLit = false, lampPlaying = false, cardTimer = null;
+  let consentOpen = false, consentFor = '';
+  let grilleTurn = 0, crank = { cw: true, n: 1 }, showerRun = null, eclipseRun = null;
   let audioCtx = null, ambience = null, whiteNoise = null;
   let profileT, hintT, toastT, pollT;
 
@@ -244,16 +312,23 @@
       if (nameDraft && !m.myName) act({ t: 'profile', name: nameDraft });
     }
     if (prev && prev.phase === 'done' && m.phase === 'lobby') {
-      letterDraft = ''; spicyDraft = true; cardDraft = ''; surpriseDraft = ''; surpriseOpen = false; envelopeOpen = false; reveal = null;
+      letterDraft = ''; spicyDraft = true; consentFor = ''; cardDraft = ''; surpriseDraft = ''; surpriseOpen = false; envelopeOpen = false; reveal = null;
       for (let i = 0; i < m.total; i++) store(scratchKey(m.code, i), null);
     }
     if (m.phase === 'playing' && m.puzzle) {
       const key = m.code + ':' + m.puzzle.idx;
       if (key !== lastStepKey) {
         lastStepKey = key; typed = ''; wheelTurn = 0; hintArmed = false; lampRun++; lampLit = false; lampPlaying = false;
+        grilleTurn = 0; crank = { cw: true, n: 1 }; showerRun = null; eclipseRun = null;
         scratch = load(scratchKey(m.code, m.puzzle.idx), emptyScratch());
         window.scrollTo(0, 0);
       }
+      // Les horaires arrivent en « dans combien de millisecondes » : on les cale une fois sur l'horloge locale.
+      const sh = m.puzzle.shower;
+      if (sh && sh.run && (!showerRun || showerRun.run !== sh.run)) showerRun = { run: sh.run, start: recv + sh.inMs, total: sh.total };
+      const ec = m.puzzle.eclipse;
+      if (ec && ec.id) { if (!eclipseRun || eclipseRun.id !== ec.id) eclipseRun = { id: ec.id, contact: recv + ec.inMs, lead: ec.lead, dur: ec.dur }; }
+      else if (ec) eclipseRun = null;
     } else if (m.phase === 'lobby') lastStepKey = '';
   }
   const scratchKey = (code, idx) => `ebib_scratch_${code}_${idx}`;
@@ -263,7 +338,8 @@
     const me = state.role;
     if (e.kind === 'note') { if (e.by !== me) playNote(e.level); }
     else if (e.kind === 'wrong') {
-      const lines = e.what === 'maze' ? WRONG_MAZE : e.what === 'grid' ? WRONG_GRID : e.guess ? WRONG_LINES : WRONG_MELODY;
+      const lines = e.what === 'maze' ? WRONG_MAZE : e.what === 'grid' ? WRONG_GRID : e.what === 'crank' ? WRONG_CRANK : e.what === 'scope' ? WRONG_SCOPE
+        : WRONG_ECLIPSE[e.what] || (e.guess ? WRONG_LINES : WRONG_MELODY);
       toast(fill(pickOne(lines), { name: nameOf(e.by), guess: e.guess }), true);
       playThud(); shakeAnswer(); buzz([40, 60, 40]);
     } else if (e.kind === 'round') {
@@ -278,12 +354,22 @@
         buzz(90);
         render();
       };
-      if (state.volume === 2 && !e.finished) { playChime(); buzz(90); return; }
+      if (tome().shared && !e.finished) { playChime(); buzz(90); return; }
       state.volume === 1 && e.idx === 4 ? setTimeout(show, 650) : show();
     } else if (e.kind === 'start') playChime();
+    else if (e.kind === 'plate') {
+      const left = e.total - e.n;
+      toast(`Plaque ${ROMAN[e.n - 1]} réussie : on voit la couronne du Soleil. Encore ${left}.`);
+      playChime(); buzz(90);
+    } else if (e.kind === 'shower') {
+      if (e.by !== me) toast(`${nameOf(e.by)} lance la pluie d’étoiles filantes. Levez les yeux.`);
+      playPing();
+    } else if (e.kind === 'launch') {
+      if (me === 'B') { toast('La lunette suit le Soleil. Attends le signal.'); playPing(); }
+    }
     else if (e.kind === 'tease') { if (e.from !== me) flyTease(e); }
     else if (e.kind === 'gage') {
-      toast(e.by === me ? 'Le contrôleur veut un gage avant de donner la réponse.' : `${nameOf(e.by)} a craqué : un gage vous attend.`);
+      toast(e.by === me ? tome().gageMine : `${nameOf(e.by)} a craqué : un gage vous attend.`);
       playPing(); buzz(60);
       setTimeout(() => { const g = document.querySelector('.gagebox'); if (g) g.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
     } else if (e.kind === 'revealed') {
@@ -338,6 +424,8 @@
   }
   function playChime() { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 1.1, 'sine', 0.13, i * 0.12)); burst(500, 1, 0.12, 0.25); }
   function playThud() { tone(92, 0.28, 'sine', 0.3); burst(320, 1, 0.1, 0.09); }
+  function playTick() { tone(2300, 0.03, 'square', 0.025); }
+  function playShutter() { burst(2400, 1.5, 0.16, 0.04); burst(900, 1.2, 0.12, 0.08, 0.07); }
   function playPing() { tone(880, 0.35, 'sine', 0.07); tone(1320, 0.3, 'sine', 0.04, 0.09); }
   function playPage() { burst(3800, 0.8, 0.05, 0.22); burst(2200, 0.7, 0.03, 0.3, 0.1); }
   function playDoor() { tone(58, 2.6, 'sawtooth', 0.09); burst(190, 2, 0.1, 2.4); [392, 523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 2.2, 'sine', 0.09, 1.5 + i * 0.22)); }
@@ -360,6 +448,26 @@
       };
       const rails = setInterval(() => { clack(0); clack(0.17); }, 1250);
       ambience = { out, stop() { clearInterval(rails); out.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.6); setTimeout(() => { rumble.stop(); out.disconnect(); }, 700); } };
+      return;
+    }
+    if (state && state.volume === 3) {
+      // Nuit d'été : un souffle de vent, des grillons, et l'horloge qui entraîne la lunette.
+      const wind = c.createBufferSource(); wind.buffer = noiseBuffer(c, 6, true); wind.loop = true;
+      const low = c.createBiquadFilter(); low.type = 'lowpass'; low.frequency.value = 380;
+      const windGain = c.createGain(); windGain.gain.value = 0.22;
+      wind.connect(low); low.connect(windGain); windGain.connect(out); wind.start();
+      const chirp = (when, f, v) => {
+        const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + when;
+        o.type = 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+        o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.06);
+      };
+      const crickets = setInterval(() => {
+        if (Math.random() < 0.7) { const f = 4300 + Math.random() * 500, v = 0.008 + Math.random() * 0.014; for (let k = 0; k < 3; k++) chirp(k * 0.065, f, v); }
+      }, 700);
+      let tock = false;
+      const clock = setInterval(() => { tock = !tock; chirp(0, tock ? 1500 : 1900, 0.012); }, 1000);
+      ambience = { out, stop() { clearInterval(crickets); clearInterval(clock); out.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.6); setTimeout(() => { wind.stop(); out.disconnect(); }, 700); } };
       return;
     }
     const fire = c.createBufferSource(); fire.buffer = noiseBuffer(c, 6, true); fire.loop = true;
@@ -418,20 +526,40 @@
       <p class="eyebrow">Escape game pour deux</p>
       <h1>La Bibliothèque<br>d’Alexandrine</h1>
       <p class="tag">Deux écrans différents, deux amoureux à retrouver,<br>et vous deux pour ouvrir les serrures.</p>
-      <div class="tomes">
-        <button class="tomecard t1" data-act="create" data-volume="1" ${busy ? 'disabled' : ''}>
-          <span class="tomeno">Tome I</span>
-          <b>La Bibliothèque</b>
-          <span class="tomewhere">À distance, en appel</span>
-          <span class="tomedesc">Une porte fermée à clé, onze ans de lettres et une heure pour sortir.</span>
-        </button>
-        <button class="tomecard t2" data-act="create" data-volume="2" ${busy ? 'disabled' : ''}>
-          <span class="tomeno">Tome II</span>
-          <b>Le Train de Nuit</b>
-          <span class="tomewhere">Côte à côte, chacun son écran</span>
-          <span class="tomedesc">La suite de leur histoire : sept voitures, des questions qui comptent et des cartes à oser.</span>
-        </button>
-      </div>
+      <section class="mode" aria-labelledby="mode-call">
+        <header class="modehead">
+          <span class="modeicon" aria-hidden="true">${ICON.phone}</span>
+          <div><h2 id="mode-call">À distance, en appel</h2><p>Chacun chez soi, un écran chacun, et un appel entre vous deux.</p></div>
+        </header>
+        <div class="tomes">
+          <button class="tomecard t1" data-act="create" data-volume="1" ${busy ? 'disabled' : ''}>
+            <span class="tomeno">Niveau 1</span>
+            <b>La Bibliothèque</b>
+            <span class="tomedesc">Une porte fermée à clé, onze ans de lettres et une heure pour sortir.</span>
+            <span class="tomemeta">Environ 1 h 20 · Tout public</span>
+          </button>
+          <button class="tomecard t3" data-act="create" data-volume="3" ${busy ? 'disabled' : ''}>
+            <span class="tomeno">Niveau 2 <em>Nouveau</em></span>
+            <b>L’Observatoire</b>
+            <span class="tomedesc">Les onze ans où ils se sont attendus : une coupole, une lunette, la même étoile chaque soir. Et des cartes pour vous découvrir encore.</span>
+            <span class="tomemeta">Environ 1 h 30 · Option coquine, 18 ans et plus</span>
+          </button>
+        </div>
+      </section>
+      <section class="mode" aria-labelledby="mode-side">
+        <header class="modehead">
+          <span class="modeicon" aria-hidden="true">${ICON.couple}</span>
+          <div><h2 id="mode-side">Côte à côte, dans la même pièce</h2><p>Un téléphone chacun, et la promesse de ne pas regarder celui de l’autre.</p></div>
+        </header>
+        <div class="tomes">
+          <button class="tomecard t2" data-act="create" data-volume="2" ${busy ? 'disabled' : ''}>
+            <span class="tomeno">Niveau 1</span>
+            <b>Le Train de Nuit</b>
+            <span class="tomedesc">Ils se sont retrouvés : sept voitures, des questions qui comptent et des gestes à oser.</span>
+            <span class="tomemeta">Environ 1 h 30 · Gestes osés en option, 18 ans et plus</span>
+          </button>
+        </div>
+      </section>
       <div class="card entry">
         <div class="sep">l’autre t’a donné un code ?</div>
         <label class="sr" for="joincode">Code de la salle</label>
@@ -455,7 +583,7 @@
       <header class="lobbyhead">
         <p class="eyebrow">Salle d’attente</p>
         <div class="roomcode" aria-label="Code de la salle">${esc(s.code)}</div>
-        ${s.volume === 2 ? '<p class="lobbytome">Tome II · Le Train de Nuit</p>' : ''}
+        <p class="lobbytome">${tome().lobbyTome}</p>
         ${s.partner ? '' : `<button class="btn" data-act="invite">Inviter l’autre</button><p class="legend">${tome().lobbyHint}</p>`}
       </header>
       <div class="players">
@@ -476,10 +604,10 @@
         <input id="pname" class="field" maxlength="24" autocomplete="off" placeholder="Comment t’appeler ?" value="${esc(nameDraft)}">
         <label for="pletter">${tome().letterLabel} <span>(facultatif, mais ça se verra)</span></label>
         <textarea id="pletter" class="field" maxlength="800" rows="3" placeholder="${tome().letterHolder}">${esc(letterDraft)}</textarea>
-        ${s.volume === 2 ? trainFields(s, other) : ''}
-        ${s.volume === 2 ? `<label class="spicy" for="pspicy">
+        ${tome().shared ? trainFields(s, other) : ''}
+        ${tome().shared ? `<label class="spicy" for="pspicy">
           <input type="checkbox" id="pspicy" ${spicyDraft ? 'checked' : ''}>
-          <span><b>Entractes osés</b> Coché par défaut : j’ai 18 ans ou plus, et je dis oui. Avec vos deux oui, vous aurez un geste osé après chaque voiture, et deux gestes tendres pour commencer en douceur. Tu préfères rester sur des gestes tendres ? Décoche la case : il suffit qu’un seul de vous deux décoche pour que toute la partie soit tendre. Le jeu n’affiche jamais le choix de l’autre, et chaque carte peut être passée sans explication.</span>
+          <span><b>Entractes osés</b> ${tome().spicyText}</span>
         </label>` : ''}
       </div>
       <div class="row">
@@ -490,12 +618,26 @@
     </main>`;
   }
 
+  function viewConsent() {
+    const them = esc(nameOf(otherOf(state.role)));
+    return `<div class="modal consent" data-key="consent"><div class="sheet darecard heat-spicy" role="dialog" aria-modal="true" aria-labelledby="consent-title">
+      <p class="eyebrow">Avant d’entrer</p>
+      <div class="cardicon" aria-hidden="true">${ICON.fire}</div>
+      <h2 id="consent-title" class="consenttitle">Tu as gardé les cartes osées</h2>
+      <p class="consenttext">${tome().consent}</p>
+      <ul class="consentlist"><li>Elles n’apparaîtront que si ${them} dit oui aussi.</li><li>${them} ne saura jamais ce que tu as choisi.</li><li>Chaque carte peut être passée, par chacun de vous, sans explication.</li></ul>
+      <button class="btn" data-act="consentyes">Oui, j’ai 18 ans ou plus et j’en ai envie</button>
+      <button class="btn ghost" data-act="consentsoft">Je préfère la version tendre</button>
+      <button class="linkbtn" data-act="consentback">Revenir au salon</button>
+    </div></div>`;
+  }
+
   function trainFields(s, other) {
     const them = esc(s.partner && s.names[other] !== roleName(other) ? s.names[other] : 'l’autre');
     const when = s.role === 'A' ? 'III' : 'V';
     return `<label for="pcard">Ta carte pour ${them} <span>(facultatif)</span></label>
         <textarea id="pcard" class="field" maxlength="300" rows="3" placeholder="Une question à lui poser, ou un geste à lui demander. Exemple : « Raconte-moi la première fois que tu as pensé à moi. »">${esc(cardDraft)}</textarea>
-        <p class="fieldnote">Elle s’affichera sur vos deux écrans après la voiture ${when}, signée de ton prénom.</p>`;
+        <p class="fieldnote">Elle s’affichera sur vos deux écrans après ${tome().after} ${when}, signée de ton prénom.</p>`;
   }
 
   function viewIntro() {
@@ -507,7 +649,7 @@
       <ul class="rules fade f5">${t.rules(esc(nameOf(otherOf(state.role)))).map(([head, body]) => `<li><b>${head}</b>${body}</li>`).join('')}</ul>
       <div class="row fade f5">
         <button class="btn" data-act="closeintro">${t.enter}</button>
-        <button class="btn ghost ink ${ambienceOn ? 'active' : ''}" data-act="ambience" aria-pressed="${ambienceOn}">${ICON.fire}<span>${t.ambience} : ${ambienceOn ? 'oui' : 'non'}</span></button>
+        <button class="btn ghost ink ${ambienceOn ? 'active' : ''}" data-act="ambience" aria-pressed="${ambienceOn}">${ambIcon()}<span>${t.ambience} : ${ambienceOn ? 'oui' : 'non'}</span></button>
       </div>
       <p class="legend ink fade f5">${t.ambienceNote}</p>
     </div></div>`;
@@ -522,13 +664,13 @@
   function viewGame() {
     const s = state, p = s.puzzle, me = s.role, other = otherOf(me);
     const remaining = p.hintsMax - p.hints.length;
-    const light = ['clues', 'score', 'cipher', 'ticket', 'chart', 'mazemap', 'line', 'notices'].includes(p.view.type);
+    const light = ['clues', 'score', 'cipher', 'ticket', 'chart', 'mazemap', 'line', 'notices', 'gears', 'grillegrid'].includes(p.view.type);
     return `<main class="game" data-key="game">
       <header class="hud">
         <div class="hudleft"><span class="role">${esc(s.names[me])}</span><span class="timer" id="timer">${fmt(elapsed())}</span></div>
         <div class="hudright">
           <span class="conn ${online ? '' : 'off'}" title="${online ? 'Connecté' : 'Hors de l’écran pour le moment'}">${esc(s.names[other])}</span>
-          <button class="iconbtn ${ambienceOn ? 'active' : ''}" data-act="ambience" aria-label="${tome().ambience}" aria-pressed="${ambienceOn}">${ICON.fire}</button>
+          <button class="iconbtn ${ambienceOn ? 'active' : ''}" data-act="ambience" aria-label="${tome().ambience}" aria-pressed="${ambienceOn}">${ambIcon()}</button>
         </div>
       </header>
       ${fails > 1 ? '<div class="netwarn">Connexion perdue, on réessaie…</div>' : ''}
@@ -570,7 +712,7 @@
       return g.reveal ? `<div class="gagebox done"><p class="eyebrow">Gage accompli · La réponse</p><p class="gagereveal">${esc(g.reveal)}</p></div>` : '';
     }
     const text = fill(g.text, { x: nameOf(g.by), y: nameOf(otherOf(g.by)) });
-    return `<div class="gagebox"><p class="eyebrow">Gage · ${p.passOnGage ? 'pour passer le contrôleur' : 'pour obtenir la réponse'}</p>
+    return `<div class="gagebox"><p class="eyebrow">Gage · ${p.passOnGage ? tome().passWhat : 'pour obtenir la réponse'}</p>
       <div class="cardicon" aria-hidden="true">${ICON.fire}</div>
       <p class="gagetext">${esc(text)}</p>
       <button class="btn" data-act="gagedone">Gage accompli, ${p.passOnGage ? 'on passe' : 'la réponse'} !</button>
@@ -607,8 +749,169 @@
       case 'mirrordo': return `<div class="mirror do">${colHead(v.size)}${Array.from({ length: v.size * v.size }, (_, i) => `<button class="pane ${scratch.marks.includes(i) ? 'lit' : ''}" data-cell="${i}" aria-pressed="${scratch.marks.includes(i)}" aria-label="Ligne ${Math.floor(i / v.size) + 1}, colonne ${i % v.size + 1}"></button>`).join('')}</div>`;
       case 'line': return `<div class="timeline"><div class="tl start"><b>Départ</b><span data-start="${esc(v.start)}">${esc(v.start)}</span></div>${v.legs.map((l) => `<div class="tl"><b>Jusqu’à ${esc(l.to)}</b><span data-min="${l.min}">${l.min} min</span></div>`).join('')}</div>`;
       case 'notices': return `<p class="stubhead">Avis du chef de train</p><ul class="stublist">${v.notices.map((n) => `<li data-delta="${n.delta}">${esc(n.text)}</li>`).join('')}</ul>`;
+      case 'focusimg': return eyepiece(p.focus);
+      case 'knobs': return knobs(p.knobs);
+      case 'grillegrid': return letterGrid(v);
+      case 'grillemask': return maskCard(v);
+      case 'shower': return shower(v, p.shower);
+      case 'gears': return gears(v);
+      case 'crank': return crankPanel(v);
+      case 'skychart': return skyChart(v);
+      case 'scope': return scopeView(v, p.window);
+      case 'eclipse': return eclipseView(p.eclipse);
+      case 'shutter': return shutterView(p.eclipse);
       default: return '';
     }
+  }
+
+  /* ---------- l'observatoire ---------- */
+  const STAR_LABEL = { big: 'Grande étoile blanche', small: 'Petite étoile blanche', blue: 'Étoile bleue', red: 'Étoile rouge' };
+  const PLACE = ['en haut à gauche', 'en haut', 'en haut à droite', 'à gauche', 'au centre', 'à droite', 'en bas à gauche', 'en bas', 'en bas à droite'];
+  const starGlyph = (k) => (k ? `<i class="st ${k}"></i>` : '');
+  const starLegend = () => `<div class="starlegend">${Object.entries(STAR_LABEL).map(([k, l]) => `<span><i class="st ${k}"></i>${l}</span>`).join('')}</div>`;
+  const rot4 = (i) => (i % 4) * 4 + (3 - Math.floor(i / 4));
+
+  function eyepiece(f) {
+    const blur = f.dist ? (1.6 + f.dist * 0.9).toFixed(1) : '0';
+    const bars = 20, lit = Math.max(0, bars - f.dist);
+    return `<div class="eyepiece ${f.dist ? '' : 'sharp'}"><div class="mire" style="filter:blur(${blur}px)"><span>${esc(f.text)}</span></div><i class="reticle"></i></div>
+      <div class="gauge" role="img" aria-label="Netteté : ${lit} sur ${bars}">${Array.from({ length: bars }, (_, i) => `<i class="${i < lit ? 'on' : ''}"></i>`).join('')}</div>
+      <p class="legend">${f.dist ? 'La jauge de netteté monte quand l’image se précise.' : 'Net ! Lis le nom à l’autre, ou tape-le.'}</p>`;
+  }
+
+  function knobs(k) {
+    const names = ['Foyer', 'Oculaire'];
+    return `<div class="knobs">${[0, 1].map((i) => `<div class="knob">
+        <p class="knobname">${names[i]}</p>
+        <div class="dial" style="--a:${(k[i] - 6) * 22}deg" aria-hidden="true"><i></i></div>
+        <b class="knobval">${k[i]}</b>
+        <div class="knobctl">
+          <button class="iconbtn large" data-act="knob" data-k="${i}" data-d="-1" aria-label="${names[i]} : un cran de moins" ${k[i] <= 0 ? 'disabled' : ''}>−</button>
+          <button class="iconbtn large" data-act="knob" data-k="${i}" data-d="1" aria-label="${names[i]} : un cran de plus" ${k[i] >= 12 ? 'disabled' : ''}>+</button>
+        </div>
+      </div>`).join('')}</div>
+      <p class="legend">Chaque molette va de 0 à 12. Tu ne vois rien : c’est l’autre qui te dit si c’est mieux.</p>`;
+  }
+
+  function letterGrid(v) {
+    const nums = [1, 2, 3, 4];
+    const rows = [0, 1, 2, 3].map((r) => `<span class="gh">${r + 1}</span>${[0, 1, 2, 3].map((c) => {
+      const i = r * 4 + c;
+      return `<button class="lg ${scratch.marks.includes(i) ? 'mark' : ''}" data-cell="${i}" aria-label="Ligne ${r + 1}, colonne ${c + 1} : ${esc(v.grid[i])}">${esc(v.grid[i])}</button>`;
+    }).join('')}`).join('');
+    return `<div class="lettergrid"><span></span>${nums.map((n) => `<span class="gh">${n}</span>`).join('')}${rows}</div>
+      <p class="legend">Lignes de haut en bas, colonnes de gauche à droite. Touche une lettre pour l’entourer.</p>`;
+  }
+
+  function maskCard(v) {
+    const pos = ((grilleTurn % 4) + 4) % 4;
+    let holes = v.holes.slice();
+    for (let k = 0; k < pos; k++) holes = holes.map(rot4);
+    const said = holes.sort((a, b) => a - b).map((i) => `ligne ${Math.floor(i / 4) + 1} colonne ${(i % 4) + 1}`).join(', ');
+    const nums = [1, 2, 3, 4].map((n) => `<span>${n}</span>`).join('');
+    return `<div class="maskwrap">
+        <div class="mcols" aria-hidden="true">${nums}</div>
+        <div class="mrows" aria-hidden="true">${nums}</div>
+        <div class="maskcard" style="transform:rotate(${grilleTurn * 90}deg)" role="img" aria-label="Carte trouée, position ${pos + 1} sur 4. Trous : ${said}.">${Array.from({ length: 16 }, (_, i) => `<span class="${v.holes.includes(i) ? 'hole' : ''}">${i === 0 ? '<i class="corner">✦</i>' : ''}</span>`).join('')}</div>
+      </div>
+      <div class="wctl"><b>Position ${pos + 1} sur 4</b><button class="btn ghost" data-act="grille">Tourner ↻</button></div>
+      <p class="legend">Les numéros autour de la carte ne tournent pas : ce sont ceux du carré de lettres.</p>`;
+  }
+
+  // Les étoiles filantes sont posées une fois ; c'est la boucle d'animation qui les fait passer à l'heure dite.
+  function shower(v, sh) {
+    const run = showerRun && sh && sh.run === showerRun.run ? showerRun : null;
+    const live = !!run && Date.now() < run.start + run.total;
+    return `<div class="nightsky" data-key="sky-${run ? run.run : 0}">
+        ${v.meteors.map((m) => `<i class="meteor ${m.letter ? 'lettered' : ''}" data-t="${m.t}" style="left:${m.x}%;top:${m.y}%"><b>${esc(m.letter)}</b></i>`).join('')}
+        <p class="skycount" aria-live="polite"></p>
+      </div>
+      <div class="row"><button class="btn" data-act="shower" ${live ? 'disabled' : ''}>${live ? 'Les étoiles filantes passent…' : run ? 'Relancer la pluie' : 'Lancer la pluie d’étoiles'}</button></div>
+      <p class="legend">La pluie tombe chez vous deux en même temps, et repasse toujours dans le même ordre.</p>`;
+  }
+
+  function gearPath(cx, cy, n, r) {
+    const h = 5, pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * 2 * Math.PI, s = Math.PI / n;
+      pts.push([a - s * 0.55, r - h], [a - s * 0.32, r + h], [a + s * 0.32, r + h], [a + s * 0.55, r - h]);
+    }
+    return 'M' + pts.map(([a, rr]) => `${(cx + rr * Math.cos(a)).toFixed(1)} ${(cy + rr * Math.sin(a)).toFixed(1)}`).join('L') + 'Z';
+  }
+  function gears(v) {
+    const R = (t) => 10 + t * 1.35;
+    const top = Math.max(R(v.c), R(v.p1), R(v.p2), R(v.d), v.idler ? R(v.idler) : 0) + 34;
+    const xc = R(v.c) + 12, x1 = xc + R(v.c) + R(v.p1) + 3;
+    const xi = v.idler ? x1 + R(v.p2) + R(v.idler) + 3 : 0;
+    const xd = v.idler ? xi + R(v.idler) + R(v.d) + 3 : x1 + R(v.p2) + R(v.d) + 3;
+    const W = xd + R(v.d) + 12, H = top * 2 + 8, y = top;
+    const gear = (cx, n, cls, label, ly) => `<g class="gear ${cls}"><path d="${gearPath(cx, y, n, R(n))}"/><circle cx="${cx}" cy="${y}" r="${Math.max(5, R(n) * 0.16)}" class="axle"/>${label ? `<text x="${cx}" y="${ly}">${label}</text>` : ''}</g>`;
+    const big = v.p1 >= v.p2;
+    const pair = big
+      ? gear(x1, v.p1, 'g2', '', 0) + gear(x1, v.p2, 'g3', `${v.p2}`, y + 6)
+      : gear(x1, v.p2, 'g3', '', 0) + gear(x1, v.p1, 'g2', `${v.p1}`, y + 6);
+    const outer = big ? `${v.p1}` : `${v.p2}`;
+    return `<div class="gearplan"><svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" role="img" aria-label="Plan de la mécanique">
+        <path class="handle" d="M${xc} ${y}L${xc} ${y - R(v.c) - 18}"/><circle class="knobend" cx="${xc}" cy="${y - R(v.c) - 18}" r="7"/>
+        ${gear(xc, v.c, 'g1', `${v.c}`, y + 6)}
+        ${pair}<text class="outer" x="${x1}" y="${y - Math.max(R(v.p1), R(v.p2)) - 12}">${outer}</text>
+        ${v.idler ? gear(xi, v.idler, 'g4', `${v.idler}`, y + 6) : ''}
+        ${gear(xd, v.d, 'g5', `${v.d}`, y + 6)}
+        <text class="cap" x="${xc}" y="${H - 6}">Manivelle</text>
+        ${v.idler ? `<text class="cap" x="${xi}" y="${H - 6}">Roue folle</text>` : ''}
+        <text class="cap" x="${xd}" y="${H - 6}">Coupole</text>
+      </svg></div>
+      <ol class="gearlist">${v.lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ol>
+      <p class="legend">Le chiffre dans chaque roue, c’est son nombre de dents.</p>`;
+  }
+
+  function crankPanel(v) {
+    return `<div class="order"><p class="eyebrow">L’ordre d’Augustin</p><p>${esc(v.target)}</p><small>${esc(v.note)}</small></div>
+      <div class="crankdir" role="group" aria-label="Sens de la manivelle">
+        <button class="dirbtn ${crank.cw ? 'on' : ''}" data-act="crankdir" data-cw="1" aria-pressed="${crank.cw}"><span aria-hidden="true">↻</span>Sens des aiguilles d’une montre</button>
+        <button class="dirbtn ${crank.cw ? '' : 'on'}" data-act="crankdir" data-cw="0" aria-pressed="${!crank.cw}"><span aria-hidden="true">↺</span>Sens inverse</button>
+      </div>
+      <div class="wctl"><button class="iconbtn large" data-act="crankn" data-d="-1" aria-label="Un tour de moins" ${crank.n <= 1 ? 'disabled' : ''}>−</button><b>${plural(crank.n, 'tour')}</b><button class="iconbtn large" data-act="crankn" data-d="1" aria-label="Un tour de plus" ${crank.n >= 40 ? 'disabled' : ''}>+</button></div>`;
+  }
+
+  function skyChart(v) {
+    const cols = 'ABCDEFGHI'.slice(0, v.size);
+    let cells = `<span></span>${[...cols].map((c) => `<span class="gh">${c}</span>`).join('')}`;
+    for (let r = 0; r < v.size; r++) {
+      cells += `<span class="gh">${r + 1}</span>`;
+      for (let c = 0; c < v.size; c++) {
+        const i = r * v.size + c, k = v.cells[i], comet = i === v.comet;
+        cells += `<button class="sc ${comet ? 'comet' : ''} ${scratch.marks.includes(i) ? 'mark' : ''}" data-cell="${i}" aria-label="${cols[c]}${r + 1} : ${k ? STAR_LABEL[k].toLowerCase() : 'vide'}${comet ? ', la comète' : ''}">${starGlyph(k)}${comet ? '<i class="cmt"></i>' : ''}</button>`;
+      }
+    }
+    return `<div class="skygrid" style="--n:${v.size}">${cells}</div>${starLegend()}
+      <p class="legend">La comète est cerclée de rouge. Touche une case pour y poser un repère, visible par toi seul.</p>`;
+  }
+
+  function scopeView(v, win) {
+    const arrow = (dir, label, sym) => `<button class="padbtn ${dir}" data-act="move" data-dir="${dir}" aria-label="${label}">${sym}</button>`;
+    const said = win.map((k, i) => `${PLACE[i]} : ${k === 'edge' ? 'bord de la carte' : k ? STAR_LABEL[k].toLowerCase() : 'rien'}`).join(' ; ');
+    return `<div class="scope"><div class="lens" role="img" aria-label="Dans la lunette, ${said}">${win.map((k) => `<span class="${k === 'edge' ? 'edge' : ''}">${k && k !== 'edge' ? starGlyph(k) : ''}</span>`).join('')}<i class="cross" aria-hidden="true"></i></div></div>
+      ${starLegend()}
+      <div class="pad">${arrow('N', 'Lunette vers le haut', '▲')}${arrow('W', 'Lunette vers la gauche', '◀')}${arrow('E', 'Lunette vers la droite', '▶')}${arrow('S', 'Lunette vers le bas', '▼')}</div>
+      <div class="row"><button class="btn" data-act="shoot">Photographier le centre</button></div>
+      <div class="row"><button class="linkbtn" data-act="move" data-dir="home">Revenir au point de départ</button></div>`;
+  }
+
+  const plates = (e) => `<div class="plates" aria-label="${e.plate} plaque${e.plate > 1 ? 's' : ''} réussie${e.plate > 1 ? 's' : ''} sur ${e.total}">${Array.from({ length: e.total }, (_, i) => `<i class="${i < e.plate ? 'on' : ''}">${ROMAN[i]}</i>`).join('')}</div>`;
+  const eclipseLive = (run) => !!run && Date.now() < run.contact + run.dur + 450;
+  function eclipseView(e) {
+    const run = eclipseRun && e.id === eclipseRun.id ? eclipseRun : null;
+    const live = eclipseLive(run);
+    return `<div class="sunbox" data-key="sun-${run ? run.id : 0}"><div class="corona"></div><div class="sun"></div><div class="moon"></div><p class="sunstate" aria-live="polite"></p></div>
+      ${plates(e)}
+      <div class="row"><button class="btn" data-act="launch" ${live ? 'disabled' : ''}>${live ? 'La Lune approche…' : run ? 'Relancer la poursuite' : 'Suivre le Soleil'}</button></div>
+      <p class="legend">Plaque ${ROMAN[Math.min(e.plate, e.total - 1)]} sur ${ROMAN[e.total - 1]}. Le noir complet raccourcit à chaque plaque.</p>`;
+  }
+  function shutterView(e) {
+    return `<div class="shutterbox"><button class="shutter" data-act="shutter"><span>Déclencher</span></button></div>
+      ${plates(e)}
+      <p class="legend">${e.running ? 'La lunette suit le Soleil. Attends le signal de l’autre.' : 'En attente : l’autre doit lancer la poursuite du Soleil.'}</p>`;
   }
 
   function board(v) {
@@ -695,12 +998,12 @@
   const colHead = (n) => `<div class="mirhead" style="grid-column:1/-1">${Array.from({ length: n }, (_, i) => `<span>${i + 1}</span>`).join('')}</div>`;
 
   function moveToken(dir) {
-    if (!state || !state.puzzle || state.puzzle.input.kind !== 'maze' || state.puzzle.view.type !== 'mazepad') return;
+    if (!state || !state.puzzle || !['mazepad', 'scope'].includes(state.puzzle.view.type)) return;
     act({ t: 'move', dir });
   }
   addEventListener('keydown', (e) => {
     const dir = { ArrowUp: 'N', ArrowRight: 'E', ArrowDown: 'S', ArrowLeft: 'W' }[e.key];
-    if (dir && !e.target.closest('input,textarea') && state && state.puzzle && state.puzzle.input.kind === 'maze') { e.preventDefault(); moveToken(dir); }
+    if (dir && !e.target.closest('input,textarea') && state && state.puzzle && ['mazepad', 'scope'].includes(state.puzzle.view.type)) { e.preventDefault(); moveToken(dir); }
   });
 
   function sheet(v) {
@@ -761,7 +1064,7 @@
     return `<div class="doorart" aria-hidden="true"><div class="arch"><i class="dl"></i><i class="dr"></i></div></div>
       <blockquote class="riddle hand">${esc(v.riddle)}</blockquote>
       <div class="sockets">${sockets.map((l, i) => `<div class="socket ${l ? 'filled' : ''}"><span>${l ? esc(l) : ''}</span><em>${i + 1}</em></div>`).join('')}</div>
-      <p class="legend">Tu as placé ${known} sceaux. Les ${6 - known} autres numéros sont chez ${esc(nameOf(otherOf(state.role)))}. Les lettres, vous les avez tous les deux en haut de l’écran.</p>`;
+      <p class="legend">Tu as placé ${known} ${known > 1 ? tome().sealsWord : tome().sealWord}. Les ${6 - known} autres numéros sont chez ${esc(nameOf(otherOf(state.role)))}. Les lettres, vous les avez tous les deux en haut de l’écran.</p>`;
   }
 
   function lamps(n) { return `<div class="lamps">${Array.from({ length: n }, (_, i) => `<i class="${i < state.played ? 'on' : ''}"></i>`).join('')}</div>`; }
@@ -769,7 +1072,12 @@
   function viewInput(p) {
     const inp = p.input;
     if (inp.kind === 'keys') return p.view.type === 'keys' ? '' : `<div class="answerbox"><div class="alabel">Notes jouées au clavecin</div>${lamps(inp.length)}</div>`;
-    if (inp.kind === 'maze' || inp.kind === 'quiz') return '';
+    if (inp.kind === 'maze' || inp.kind === 'quiz' || inp.kind === 'scope' || inp.kind === 'eclipse') return '';
+    if (inp.kind === 'crank') {
+      return p.view.type === 'crank'
+        ? '<div class="answerbox"><button class="btn" data-act="submitcrank">Actionner la manivelle</button></div>'
+        : `<div class="answerbox"><div class="alabel">${esc(nameOf(otherOf(state.role)))} actionnera la manivelle quand vous serez sûrs.</div></div>`;
+    }
     if (inp.kind === 'grid') {
       return p.view.type === 'mirrordo'
         ? '<div class="answerbox"><button class="btn" data-act="submitgrid">Essayer le loquet</button></div>'
@@ -812,13 +1120,13 @@
       const total = r.sync ? r.total : r.cards.length;
       const text = c.kind === 'written' ? c.text : c.to ? fill(c.text, { x: nameOf(c.to), y: nameOf(otherOf(c.to)) }) : c.text;
       const next = r.card < total - 1;
-      const train = state.volume === 2;
+      const train = !!tome().shared;
       const countdown = c.secs
         ? `<div class="cardtimer">${cardTimer
           ? `<b>${cardTimer.left}</b><span>secondes</span>`
           : `<button class="btn ghost" data-act="cardtimer" data-secs="${c.secs}">Lancer la minute</button>`}</div>`
         : '';
-      const label = c.kind === 'written' ? `Carte de ${esc(nameOf(c.from))}, pour ${esc(nameOf(otherOf(c.from)))}` : c.kind === 'deep' ? 'Question · Réponds sincèrement' : !train ? 'Entracte · À voix haute' : c.heat === 'spicy' ? 'Geste · Osé' : 'Geste · Tendre';
+      const label = c.kind === 'written' ? `Carte de ${esc(nameOf(c.from))}, pour ${esc(nameOf(otherOf(c.from)))}` : c.label ? esc(c.label) : c.kind === 'deep' ? 'Question · Réponds sincèrement' : !train ? 'Entracte · À voix haute' : tome().heat[c.heat === 'spicy' ? 'spicy' : 'tender'];
       const icon = c.kind === 'written' ? ICON.quill : c.kind === 'deep' ? SYM.moon : c.heat === 'spicy' ? ICON.fire : ICON.heart;
       return `<div class="modal" data-key="card-${r.idx}-${r.card}"><div class="sheet darecard ${c.kind} ${c.heat ? 'heat-' + c.heat : ''}">
         <div class="cardhead"><p class="eyebrow">${label}</p>${total > 1 ? `<span class="cardcount">${r.card + 1} / ${total}</span>` : ''}</div>
@@ -826,16 +1134,16 @@
         <p class="dare">${esc(text)}</p>
         ${countdown}
         <p class="legend">${tome().cardLegend}</p>
-        ${r.sync ? syncButton(r, next ? 'Carte suivante' : 'On reprend le voyage') : `<button class="btn" data-act="${next ? 'nextcard' : 'closereveal'}">${next ? 'Carte suivante' : 'On continue'}</button>`}
+        ${r.sync ? syncButton(r, next ? 'Carte suivante' : tome().resume) : `<button class="btn" data-act="${next ? 'nextcard' : 'closereveal'}">${next ? 'Carte suivante' : 'On continue'}</button>`}
         ${train ? `<button class="linkbtn" data-act="${r.sync ? 'skipcard' : next ? 'nextcard' : 'closereveal'}">On passe celle-là</button>` : ''}
       </div></div>`;
     }
     const t = tome();
     const seal = r.seal ? `<div class="sealbox"><div class="bigseal">${esc(r.seal.letter)}${r.seal.number != null ? `<sup>${r.seal.number}</sup>` : ''}</div>
-      <p class="sealmsg">${r.seal.number != null ? `Le numéro <b>${r.seal.number}</b> n’apparaît que chez toi. Garde-le, ou dis-le : à toi de voir.` : `Ce ${t.sealWord} a un numéro, mais c’est ${esc(nameOf(otherOf(state.role)))} qui l’a.`}</p></div>` : '';
+      <p class="sealmsg">${r.seal.number != null ? `Le numéro <b>${r.seal.number}</b> n’apparaît que chez toi. Garde-le, ou dis-le : à toi de voir.` : `${t.sealThis} a un numéro, mais c’est ${esc(nameOf(otherOf(state.role)))} qui l’a.`}</p></div>` : '';
     const hasCards = r.sync || (r.cards && r.cards.length);
-    const body = state.volume === 2
-      ? `<div class="letter telegram parchment"><div class="tghead"><b>Télégramme</b><span>Cie du Nocturne · Voiture ${ROMAN[r.idx]}</span></div><p class="hand">${typewriter(r.page.text)}</p><p class="sig">— ${esc(r.page.from)}</p></div>`
+    const body = t.pageHead
+      ? `<div class="letter telegram parchment"><div class="tghead"><b>${t.pageHead[0]}</b><span>${t.pageHead[1](r.idx)}</span></div><p class="hand">${typewriter(r.page.text)}</p><p class="sig">— ${esc(r.page.from)}</p></div>`
       : `<div class="letter parchment"><p class="hand">${esc(r.page.text)}</p><p class="sig">— ${esc(r.page.from)}</p></div>`;
     return `<div class="modal" data-key="letter-${r.idx}"><div class="sheet letterwrap">
       <p class="eyebrow">${r.finished ? t.lastLetter : `${t.foundLetter} · ${esc(r.title)}`}</p>
@@ -882,7 +1190,7 @@
       award('hints', 'L’humilité', '{name} a demandé {n} indice(s). C’est noté.', '{n} indice(s) de chaque côté. Personne n’a craqué seul.', 'Zéro indice. Quel orgueil.'),
       award('teases', 'L’insolence', '{name}, avec {n} message(s) envoyé(s) pendant que l’autre réfléchissait.', 'Égalité : {n} message(s) de chaque côté.', 'Personne n’a osé taquiner l’autre. Alexandrine est déçue.'),
     ];
-    if (s.volume === 2) awards.push(award('gages', 'L’audace', '{name} a payé {n} gage(s) pour obtenir une réponse. Le contrôleur a apprécié.', '{n} gage(s) chacun. Le contrôleur rougit encore.', 'Aucun gage. Le contrôleur est presque déçu.'));
+    if (t.gageAward) awards.push(award('gages', 'L’audace', ...t.gageAward));
     const letter = s.theirLetter;
     const letterBody = letter
       ? `<div class="letter parchment opened"><p class="hand keep">${esc(letter)}</p><p class="sig">— ${esc(s.names[other])}</p></div>`
@@ -972,13 +1280,14 @@
     keepAwake(!!state && state.phase === 'playing');
     document.body.dataset.phase = state ? state.phase : 'home';
     const volume = String((state && state.volume) || 1);
-    if (document.body.dataset.volume !== volume) { document.body.dataset.volume = volume; if (volume === '2') paintTrainScene(); }
+    if (document.body.dataset.volume !== volume) { document.body.dataset.volume = volume; if (volume === '2') paintTrainScene(); if (volume === '3') paintObservatory(); }
     let html;
     if (!state) html = viewHome();
     else if (state.phase === 'lobby') html = viewLobby();
     else if (state.phase === 'playing') html = viewGame();
     else html = viewDone();
     if (state && state.phase === 'playing' && !introSeen) html += viewIntro();
+    if (state && state.phase === 'lobby' && consentOpen) html += viewConsent();
     if (reveal) html += viewReveal(reveal);
     else if (state && state.phase === 'playing' && state.interlude) html += viewReveal(sharedReveal());
     html = html.replace(/ ([:;?!»])/g, ' $1').replace(/« /g, '« ');
@@ -1048,7 +1357,13 @@
     switch (b.dataset.act) {
       case 'create': homeError = ''; enter({ t: 'create', volume: Number(b.dataset.volume) || 1 }); break;
       case 'join': tryJoin(document.getElementById('joincode').value); break;
-      case 'ready': clearTimeout(profileT); store('ebib_name', nameDraft); act({ t: 'ready', value: !state.ready, name: nameDraft, letter: letterDraft, spicy: spicyDraft, card: cardDraft, surprise: surpriseDraft }); break;
+      case 'ready':
+        if (!state.ready && tome().consent && spicyDraft && consentFor !== state.code) { consentOpen = true; render(); break; }
+        sendReady();
+        break;
+      case 'consentyes': consentOpen = false; consentFor = state.code; sendReady(); break;
+      case 'consentsoft': consentOpen = false; spicyDraft = false; sendReady(); break;
+      case 'consentback': consentOpen = false; render(); break;
       case 'swap': act({ t: 'swap' }); break;
       case 'invite': invite(); break;
       case 'closeintro': introSeen = true; store('ebib_intro_' + state.code, true); playPage(); render(); break;
@@ -1078,6 +1393,19 @@
       case 'cardtimer': startCardTimer(Number(b.dataset.secs)); break;
       case 'lamp': if (!lampPlaying) playLamp(); break;
       case 'move': moveToken(b.dataset.dir); break;
+      case 'knob': playTick(); act({ t: 'knob', k: Number(b.dataset.k), d: Number(b.dataset.d) }); break;
+      case 'grille': grilleTurn++; playPage(); render(); break;
+      case 'crankdir': crank.cw = b.dataset.cw === '1'; playTick(); render(); break;
+      case 'crankn': crank.n = Math.max(1, Math.min(40, crank.n + Number(b.dataset.d))); playTick(); render(); break;
+      case 'submitcrank': act({ t: 'submit', answer: (crank.cw ? 'H' : 'I') + crank.n }); break;
+      case 'shower': act({ t: 'shower' }); break;
+      case 'launch': act({ t: 'launch' }); playPing(); break;
+      case 'shutter':
+        playShutter(); buzz(40);
+        if (!state.puzzle.eclipse.running) toast('Rien dans la lunette : l’autre doit d’abord lancer la poursuite du Soleil.');
+        act({ t: 'shutter' });
+        break;
+      case 'shoot': playShutter(); act({ t: 'shoot' }); break;
       case 'vote': act({ t: 'vote', who: b.dataset.who }); break;
       case 'submitgrid': {
         const size = state.puzzle.view.size;
@@ -1097,6 +1425,7 @@
       case 'quitconfirm': leave(); break;
     }
   });
+  function sendReady() { clearTimeout(profileT); store('ebib_name', nameDraft); act({ t: 'ready', value: !state.ready, name: nameDraft, letter: letterDraft, spicy: spicyDraft, card: cardDraft, surprise: surpriseDraft }); render(); }
   function stopCardTimer() { if (cardTimer) clearInterval(cardTimer.id); cardTimer = null; }
   function startCardTimer(secs) {
     stopCardTimer();
@@ -1216,7 +1545,7 @@
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     let lastFrame = 0;
     (function tick(now) {
-      if (!document.hidden && document.body.dataset.volume !== '2' && now - lastFrame >= 40) {
+      if (!document.hidden && document.body.dataset.volume === '1' && now - lastFrame >= 40) {
         lastFrame = now;
         cx.clearRect(0, 0, W, H);
         for (const p of parts) {
@@ -1290,6 +1619,113 @@
     frame.className = 'trainframe';
     scene.appendChild(frame);
   }
+
+  /* ---------- décor de l'observatoire : un ciel qui tourne lentement autour du pôle, et la coupole ---------- */
+  let skyPainted = false;
+  function paintObservatory() {
+    if (skyPainted) return;
+    skyPainted = true;
+    const host = document.getElementById('observatory');
+    const W = innerWidth, H = Math.max(innerHeight, screen.height || 0);
+    const px = W * 0.5, py = H * 0.16;
+    const R = Math.ceil(Math.hypot(Math.max(px, W - px), Math.max(py, H - py))) + 8;
+    const cv = document.createElement('canvas');
+    cv.className = 'starfield';
+    cv.width = cv.height = R * 2;
+    cv.style.left = `${px - R}px`; cv.style.top = `${py - R}px`; cv.style.width = cv.style.height = `${R * 2}px`;
+    const cx = cv.getContext('2d');
+    // La Voie lactée : une bande de brume colorée en travers du ciel.
+    cx.save(); cx.translate(R, R); cx.rotate(-0.6);
+    for (let i = 0; i < 140; i++) {
+      const x = (Math.random() - 0.5) * R * 2.2, y = (Math.random() - 0.5) * R * 0.32 * (1 + Math.random());
+      const g = cx.createRadialGradient(x, y, 0, x, y, 40 + Math.random() * 120);
+      const tint = Math.random() < 0.3 ? '190,150,255' : Math.random() < 0.5 ? '140,170,255' : '255,225,200';
+      g.addColorStop(0, `rgba(${tint},${(0.025 + Math.random() * 0.035).toFixed(3)})`); g.addColorStop(1, `rgba(${tint},0)`);
+      cx.fillStyle = g; cx.fillRect(x - 160, y - 160, 320, 320);
+    }
+    cx.restore();
+    const n = Math.floor((R * R * 4) / 1500);
+    for (let i = 0; i < n; i++) {
+      const x = Math.random() * R * 2, y = Math.random() * R * 2, m = Math.random();
+      const size = m < 0.9 ? 0.6 + Math.random() * 0.7 : m < 0.985 ? 1.4 + Math.random() : 2.2 + Math.random() * 1.2;
+      const hue = Math.random();
+      cx.fillStyle = hue < 0.12 ? 'rgba(170,200,255,' : hue < 0.2 ? 'rgba(255,205,160,' : 'rgba(245,245,255,';
+      cx.fillStyle += `${(0.35 + Math.random() * 0.65).toFixed(2)})`;
+      cx.beginPath(); cx.arc(x, y, size, 0, 6.283); cx.fill();
+      if (size > 2.2) {
+        const g = cx.createRadialGradient(x, y, 0, x, y, size * 5);
+        g.addColorStop(0, 'rgba(220,230,255,.35)'); g.addColorStop(1, 'rgba(220,230,255,0)');
+        cx.fillStyle = g; cx.fillRect(x - size * 5, y - size * 5, size * 10, size * 10);
+      }
+    }
+    host.appendChild(cv);
+    // Quelques étoiles qui scintillent par-dessus.
+    for (let i = 0; i < 26; i++) {
+      const t = document.createElement('i');
+      t.className = 'twinkle';
+      t.style.left = `${Math.random() * 100}%`; t.style.top = `${Math.random() * 70}%`;
+      t.style.animationDelay = `${(Math.random() * 6).toFixed(2)}s`; t.style.animationDuration = `${(3 + Math.random() * 4).toFixed(2)}s`;
+      host.appendChild(t);
+    }
+    // La colline et la coupole, fente ouverte, la lunette pointée vers le ciel.
+    host.insertAdjacentHTML('beforeend', `<svg class="dome" viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <path d="M0 200 Q 220 150 420 178 T 820 170 T 1200 186 V260 H0Z" fill="#03050f"/>
+      <rect x="760" y="150" width="190" height="60" fill="#050817"/>
+      <path d="M752 152 A103 103 0 0 1 958 152 Z" fill="#070b1e"/>
+      <path d="M842 152 L842 64 A103 103 0 0 1 868 66 L868 152 Z" fill="#101a3e"/>
+      <path d="M850 120 L906 40" stroke="#1d2a5c" stroke-width="13" stroke-linecap="round"/>
+      <rect x="836" y="176" width="16" height="20" rx="2" fill="#f3c97a" opacity=".55"/>
+      <path d="M752 152 A103 103 0 0 1 958 152" fill="none" stroke="rgba(200,162,92,.28)" stroke-width="2"/>
+    </svg>`);
+  }
+
+  // Les étoiles filantes et la Lune bougent à l'heure du serveur, image par image, sans passer par le rendu.
+  (function skyLoop() {
+    let lastKey = '';
+    function frame() {
+      requestAnimationFrame(frame);
+      if (!state || state.phase !== 'playing' || !state.puzzle || document.hidden) return;
+      const type = state.puzzle.view.type, now = Date.now();
+      if (type === 'shower') {
+        const r = showerRun;
+        if (!r) return;
+        const live = now < r.start + r.total;
+        const key = `sh${r.run}${live}`;
+        if (key !== lastKey) { lastKey = key; render(); }
+        const count = document.querySelector('.skycount');
+        if (count) {
+          const txt = now < r.start ? `Les étoiles filantes arrivent dans ${Math.ceil((r.start - now) / 1000)}…` : '';
+          if (count.textContent !== txt) count.textContent = txt;
+        }
+        document.querySelectorAll('.meteor').forEach((el) => {
+          const u = now - r.start - Number(el.dataset.t);
+          if (u < 0 || u > 1800) { el.style.opacity = '0'; return; }
+          const q = u / 1800, ease = 1 - (1 - q) * (1 - q);
+          el.style.opacity = String(u < 1300 ? 1 : 1 - (u - 1300) / 500);
+          el.style.transform = `translate(${(-ease * 150).toFixed(1)}px,${(ease * 86).toFixed(1)}px)`;
+        });
+      } else if (type === 'eclipse') {
+        const box = document.querySelector('.sunbox');
+        if (!box) return;
+        const r = eclipseRun;
+        const live = eclipseLive(r);
+        const key = `ec${r ? r.id : 0}${live}`;
+        if (key !== lastKey) { lastKey = key; render(); }
+        let x = 150, total = false, label = 'Lance la poursuite : la Lune arrivera par la droite.';
+        if (r) {
+          const end = r.contact + r.dur;
+          if (now < r.contact) { x = Math.min(150, ((r.contact - now) / r.lead) * 150); label = 'La Lune approche…'; }
+          else if (now <= end) { x = 0; total = true; label = 'Noir complet !'; }
+          else { x = -Math.min(150, ((now - end) / 1400) * 150); label = live ? 'Le Soleil revient…' : 'C’est passé. Relance la poursuite pour retenter.'; }
+        }
+        const moon = box.querySelector('.moon'), st = box.querySelector('.sunstate');
+        moon.style.transform = `translateX(${x.toFixed(1)}%)`;
+        box.classList.toggle('total', total);
+        if (st.textContent !== label) st.textContent = label;
+      }
+    }
+    requestAnimationFrame(frame);
+  })();
 
   // Grain du papier : une petite image calculée une fois, répétée par le CSS.
   (function paperGrain() {
