@@ -178,12 +178,12 @@ test('observatoire : l’éclipse, seul A voit venir le contact, B déclenche à
 });
 
 test('observatoire : l’éclipse se passe contre un gage, les autres énigmes donnent leur réponse', () => {
-  const room = started(false, true);
-  assert.strictEqual(room.spicy, false);
+  const room = started();
+  assert.strictEqual(room.spicy, false, 'pas d’option osée dans ce niveau');
   const inst = enter(room, 5);
   for (let i = 0; i < inst.hints.length; i++) tick(room, 'A', { t: 'hint' });
   tick(room, 'B', { t: 'askanswer' });
-  assert.ok(O.GAGES.tender.includes(G.snapshot(room, 'A').puzzle.gage.text), 'tendre si un seul a refusé');
+  assert.ok(O.GAGES.tender.includes(G.snapshot(room, 'A').puzzle.gage.text), 'un gage de la liste');
   tick(room, 'A', { t: 'gagedone' });
   assert.strictEqual(room.step, 6);
   for (const p of O.buildAll()) {
@@ -192,21 +192,20 @@ test('observatoire : l’éclipse se passe contre un gage, les autres énigmes d
   }
 });
 
-test('observatoire : chaque nuit, une carte pour se découvrir ; le sensuel seulement avec le double oui', () => {
+test('observatoire : chaque nuit, une carte pour se découvrir et une pour rire, deux coquines en tout', () => {
+  assert.ok(!O.SPICY, 'pas de case à cocher');
   for (let i = 0; i < 6; i++) {
-    const hot = O.cardsFor(i, true), soft = O.cardsFor(i, false);
-    for (const cards of [hot, soft]) {
-      assert.ok(cards.some((c) => c.kind === 'deep'), 'se découvrir, chaque nuit');
-      assert.ok(cards.some((c) => c.heat === 'tender'), 'rire, chaque nuit');
-    }
-    assert.ok(!soft.some((c) => c.heat === 'spicy'), 'aucune carte osée sans le double oui');
-    assert.ok([...hot, ...soft].every((c) => c.label && c.text), 'chaque carte a son titre');
+    const cards = O.cardsFor(i);
+    assert.ok(cards.some((c) => c.kind === 'deep'), 'se découvrir, chaque nuit');
+    assert.ok(cards.some((c) => c.heat === 'tender'), 'rire, chaque nuit');
+    assert.ok(cards.every((c) => c.label && c.text), 'chaque carte a son titre');
+    for (const c of cards) if (!c.to) assert.ok(!/{[xy]}/.test(c.text), 'une carte pour les deux ne nomme personne');
   }
-  const all = [0, 1, 2, 3, 4, 5].flatMap((i) => O.cardsFor(i, true));
+  const all = [0, 1, 2, 3, 4, 5].flatMap((i) => O.cardsFor(i));
   assert.strictEqual(all.filter((c) => c.heat === 'spicy').length, 2, 'deux cartes coquines, pas plus');
   // À distance : rien à retirer ni à montrer, que l'appel soit en vidéo ou non. Pas de chanson, pas de mielleux.
   const texts = JSON.stringify([O.NIGHTS, O.GAGES]);
-  assert.ok(!/vêtement|retire|enlève|photo|vidéo|caméra|chant|tu me manques/i.test(texts), 'jouable en appel simple, sans chanter');
+  assert.ok(!/vêtement|retire|enlève|envoie.{0,12}photo|selfie|vidéo|caméra|chant|tu me manques/i.test(texts), 'jouable en appel simple, sans chanter');
   assert.ok(!/notre lit|votre lit|chez vous|film/i.test(texts));
 });
 

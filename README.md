@@ -6,7 +6,7 @@ Deux façons de jouer, séparées dès l'accueil.
 
 **À distance, en appel** : chacun chez soi.
 - **Niveau 1, La Bibliothèque** (tome 1 dans le code).
-- **Niveau 2, L'Observatoire** (tome 3 dans le code) : les onze ans où Augustin cartographiait le ciel austral. Mise au point à deux molettes, grille tournante, pluie d'étoiles filantes synchronisée sur les deux écrans, engrenages, comète à retrouver avec une lunette qui ne voit que neuf cases, éclipse à photographier à l'aveugle. Entractes partagés comme dans le train, à jouer à la voix, avec l'option osée et les gages.
+- **Niveau 2, L'Observatoire** (tome 3 dans le code) : les onze ans où Augustin cartographiait le ciel austral. Mise au point à deux molettes, grille tournante, pluie d'étoiles filantes synchronisée sur les deux écrans, engrenages, comète à retrouver avec une lunette qui ne voit que neuf cases, éclipse à photographier à l'aveugle. Entractes partagés comme dans le train, à jouer à la voix : surtout des jeux pour se découvrir et rire, deux cartes un peu coquines, et des gages. Pas de case à cocher, le niveau reste léger.
 
 **Côte à côte, dans la même pièce** :
 - **Niveau 1, Le Train de Nuit** (tome 2 dans le code) : côte à côte, un téléphone chacun, en promettant de ne pas regarder l'écran de l'autre. Après chaque voiture, un entracte partagé sur les deux écrans : un télégramme, un geste osé si les deux joueurs majeurs disent oui (avec deux gestes tendres pour s'échauffer), sinon un geste tendre, parfois une question ou une carte écrite par l'un des joueurs dans le salon. On avance quand les deux ont appuyé ; chacun peut passer une carte seul.
@@ -39,4 +39,4 @@ Les navigateurs interrogent `/api/game` environ une fois par seconde, ce qui sur
 Ajouter une fonction dans le fichier du tome (vue A, vue B, réponse, indices, lettre), l'ajouter dans `buildAll()`, et si besoin un nouveau `type` de vue dans `viewBody()` de `public/app.js`. Les six premières étapes donnent chacune un sceau : garder `SEALS` et les cartes d'entracte alignés.
 
 ## Ajouter un tome
-Créer un fichier qui exporte `buildAll`, `cardsFor`, `SEALS` et `FINAL_WORD` (plus `SHARED`, `SPICY`, `GAGES` et `WRITTEN_AFTER` pour des entractes partagés avec option osée), le déclarer dans `VOLUMES` (`lib/game.js`) et dans `TOMES` (`public/app.js`), puis lui donner son thème sous `body[data-volume="N"]` dans `public/style.css`.
+Créer un fichier qui exporte `buildAll`, `cardsFor`, `SEALS` et `FINAL_WORD` (plus `SHARED`, `GAGES` et `WRITTEN_AFTER` pour des entractes partagés, et `SPICY` pour proposer l'option osée dans le salon), le déclarer dans `VOLUMES` (`lib/game.js`) et dans `TOMES` (`public/app.js`), puis lui donner son thème sous `body[data-volume="N"]` dans `public/style.css`.

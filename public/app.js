@@ -41,7 +41,7 @@
   ];
   const WRONG_ECLIPSE = {
     early: ['{name} a déclenché trop tôt : la plaque montre un Soleil éclatant. On relance.', 'Trop tôt, {name}. La Lune n’était pas encore là.'],
-    late: ['{name} a déclenché trop tard : le Soleil était déjà revenu. On relance.', 'Trop tard, {name}. Le noir est passé sans toi.'],
+    late: ['{name} a déclenché trop tard : le Soleil était déjà revenu. On relance.', 'Trop tard, {name}. Le temps que le signal arrive, le noir était passé.'],
   };
 
   // Ce qui change d'un tome à l'autre, côté interface.
@@ -124,8 +124,6 @@
       shared: true, after: 'la nuit', resume: 'Retour à la lunette',
       pageHead: ['Lettre', (idx) => `Observatoire · Nuit ${ROMAN[idx]}`],
       heat: { spicy: 'Carte · Osée', tender: 'Carte · Tendre' },
-      spicyText: 'Coché par défaut : j’ai 18 ans ou plus et je dis oui. Si vous dites oui tous les deux, deux cartes un peu plus coquines s’ajoutent à la partie, à jouer à la voix. Si l’un de vous décoche, elles disparaissent. Le jeu ne montre jamais le choix de l’autre, et toutes les cartes peuvent être passées.',
-      consent: 'Dans ce niveau, ça reste léger : deux cartes un peu coquines dans toute la partie, à jouer à la voix. Rien à montrer, rien à retirer, en appel simple comme en vidéo.',
       gageMine: 'Augustin veut un gage avant de donner la réponse.', passWhat: 'pour passer l’éclipse',
       gageAward: ['{name} a payé {n} gage(s) pour obtenir une réponse. Augustin a tout noté.', '{n} gage(s) chacun. Augustin a cassé sa plume.', 'Aucun gage. Augustin est presque déçu.'],
       roles: { A: 'L’Astronome', B: 'Le Machiniste' },
@@ -542,7 +540,7 @@
             <span class="tomeno">Niveau 2 <em>Nouveau</em></span>
             <b>L’Observatoire</b>
             <span class="tomedesc">Les onze ans où ils se sont attendus : une coupole, une lunette, la même étoile chaque soir. Et des cartes pour vous découvrir encore.</span>
-            <span class="tomemeta">Environ 1 h 30 · Option coquine, 18 ans et plus</span>
+            <span class="tomemeta">Environ 1 h 30 · En appel, voix ou vidéo</span>
           </button>
         </div>
       </section>
@@ -605,7 +603,7 @@
         <label for="pletter">${tome().letterLabel} <span>(facultatif, mais ça se verra)</span></label>
         <textarea id="pletter" class="field" maxlength="800" rows="3" placeholder="${tome().letterHolder}">${esc(letterDraft)}</textarea>
         ${tome().shared ? trainFields(s, other) : ''}
-        ${tome().shared ? `<label class="spicy" for="pspicy">
+        ${tome().spicyText ? `<label class="spicy" for="pspicy">
           <input type="checkbox" id="pspicy" ${spicyDraft ? 'checked' : ''}>
           <span><b>Entractes osés</b> ${tome().spicyText}</span>
         </label>` : ''}
