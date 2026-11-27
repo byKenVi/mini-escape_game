@@ -114,7 +114,7 @@ test('partie complète : du salon à la porte, avec lettres scellées', () => {
 
   tick(room, 'B', { t: 'restart' });
   assert.strictEqual(room.phase, 'lobby');
-  assert.strictEqual(room.players.A.letter, '');
+  assert.strictEqual(room.players.A.letter, 'Pour toi', 'rejouer ne perd pas une lettre');
   assert.strictEqual(room.players.A.name, 'Ken');
 });
 

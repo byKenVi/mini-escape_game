@@ -75,10 +75,8 @@ test('observatoire : les engrenages donnent le bon nombre de tours et le bon sen
     const g = O.buildGears();
     // Simulation : on fait tourner la manivelle et on suit chaque roue.
     let turns = g.K, cw = g.crankCw;
-    turns = (turns * g.c) / g.p1; cw = !cw; // engrène la grande roue
-    // roue solidaire : même sens, mêmes tours
     if (g.idler) { cw = !cw; } // la roue folle inverse, sans changer la vitesse
-    turns = (turns * g.p2) / g.d; cw = !cw; // engrène la couronne
+    turns = (turns * g.c) / g.d; cw = !cw; // engrène la couronne
     assert.strictEqual(turns, g.N);
     assert.strictEqual(cw, g.domeCw);
     assert.match(g.answer, /^[HI]\d+$/);

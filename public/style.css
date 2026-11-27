@@ -884,3 +884,11 @@ body[data-volume="3"] .padbtn{border-radius:50%;border-color:rgba(200,162,92,.6)
 .consentlist{list-style:none;margin:0;padding:12px 14px;display:grid;gap:6px;text-align:left;font-size:16px;line-height:1.3;color:#fff0e4;border-radius:10px;background:rgba(0,0,0,.25)}
 .consentlist li:before{content:"✓ ";color:#ffb3a0}
 .consent .btn{width:100%;white-space:normal}
+
+/* Comète : la croix du départ ; engrenages : la note de la marge. */
+.startx{position:absolute;inset:16%;pointer-events:none}
+.startx:before,.startx:after{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:#ecd49a;box-shadow:0 0 4px rgba(236,212,154,.8)}
+.startx:after{transform:rotate(90deg)}
+.sc.start{box-shadow:inset 0 0 0 2px #ecd49a}
+.sc.start.comet{box-shadow:inset 0 0 0 2px #ff7a66,inset 0 0 0 4px #ecd49a}
+.gearmargin{margin:10px 6px 4px;padding:8px 12px;border-left:2px solid rgba(110,70,30,.45);font-family:"IM Fell English",serif;font-style:italic;font-size:.95rem;line-height:1.4;color:#5a3d1e}

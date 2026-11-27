@@ -310,7 +310,7 @@
       if (nameDraft && !m.myName) act({ t: 'profile', name: nameDraft });
     }
     if (prev && prev.phase === 'done' && m.phase === 'lobby') {
-      letterDraft = ''; spicyDraft = true; consentFor = ''; cardDraft = ''; surpriseDraft = ''; surpriseOpen = false; envelopeOpen = false; reveal = null;
+      letterDraft = m.myLetter || ''; spicyDraft = true; consentFor = ''; cardDraft = m.myCard || ''; surpriseDraft = m.mySurprise || ''; surpriseOpen = false; envelopeOpen = false; reveal = null;
       for (let i = 0; i < m.total; i++) store(scratchKey(m.code, i), null);
     }
     if (m.phase === 'playing' && m.puzzle) {
@@ -838,28 +838,23 @@
   }
   function gears(v) {
     const R = (t) => 10 + t * 1.35;
-    const top = Math.max(R(v.c), R(v.p1), R(v.p2), R(v.d), v.idler ? R(v.idler) : 0) + 34;
-    const xc = R(v.c) + 12, x1 = xc + R(v.c) + R(v.p1) + 3;
-    const xi = v.idler ? x1 + R(v.p2) + R(v.idler) + 3 : 0;
-    const xd = v.idler ? xi + R(v.idler) + R(v.d) + 3 : x1 + R(v.p2) + R(v.d) + 3;
+    const top = Math.max(R(v.c), R(v.d), v.idler ? R(v.idler) : 0) + 34;
+    const xc = R(v.c) + 12;
+    const xi = v.idler ? xc + R(v.c) + R(v.idler) + 3 : 0;
+    const xd = v.idler ? xi + R(v.idler) + R(v.d) + 3 : xc + R(v.c) + R(v.d) + 3;
     const W = xd + R(v.d) + 12, H = top * 2 + 8, y = top;
     const gear = (cx, n, cls, label, ly) => `<g class="gear ${cls}"><path d="${gearPath(cx, y, n, R(n))}"/><circle cx="${cx}" cy="${y}" r="${Math.max(5, R(n) * 0.16)}" class="axle"/>${label ? `<text x="${cx}" y="${ly}">${label}</text>` : ''}</g>`;
-    const big = v.p1 >= v.p2;
-    const pair = big
-      ? gear(x1, v.p1, 'g2', '', 0) + gear(x1, v.p2, 'g3', `${v.p2}`, y + 6)
-      : gear(x1, v.p2, 'g3', '', 0) + gear(x1, v.p1, 'g2', `${v.p1}`, y + 6);
-    const outer = big ? `${v.p1}` : `${v.p2}`;
     return `<div class="gearplan"><svg viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" role="img" aria-label="Plan de la mécanique">
         <path class="handle" d="M${xc} ${y}L${xc} ${y - R(v.c) - 18}"/><circle class="knobend" cx="${xc}" cy="${y - R(v.c) - 18}" r="7"/>
         ${gear(xc, v.c, 'g1', `${v.c}`, y + 6)}
-        ${pair}<text class="outer" x="${x1}" y="${y - Math.max(R(v.p1), R(v.p2)) - 12}">${outer}</text>
         ${v.idler ? gear(xi, v.idler, 'g4', `${v.idler}`, y + 6) : ''}
         ${gear(xd, v.d, 'g5', `${v.d}`, y + 6)}
         <text class="cap" x="${xc}" y="${H - 6}">Manivelle</text>
-        ${v.idler ? `<text class="cap" x="${xi}" y="${H - 6}">Roue folle</text>` : ''}
+        ${v.idler ? `<text class="cap" x="${xi}" y="${y - R(v.idler) - 14}">Roue folle</text>` : ''}
         <text class="cap" x="${xd}" y="${H - 6}">Coupole</text>
       </svg></div>
       <ol class="gearlist">${v.lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ol>
+      ${v.margin ? `<p class="gearmargin">${esc(v.margin)}</p>` : ''}
       <p class="legend">Le chiffre dans chaque roue, c’est son nombre de dents.</p>`;
   }
 
@@ -878,12 +873,12 @@
     for (let r = 0; r < v.size; r++) {
       cells += `<span class="gh">${r + 1}</span>`;
       for (let c = 0; c < v.size; c++) {
-        const i = r * v.size + c, k = v.cells[i], comet = i === v.comet;
-        cells += `<button class="sc ${comet ? 'comet' : ''} ${scratch.marks.includes(i) ? 'mark' : ''}" data-cell="${i}" aria-label="${cols[c]}${r + 1} : ${k ? STAR_LABEL[k].toLowerCase() : 'vide'}${comet ? ', la comète' : ''}">${starGlyph(k)}${comet ? '<i class="cmt"></i>' : ''}</button>`;
+        const i = r * v.size + c, k = v.cells[i], comet = i === v.comet, start = i === v.start;
+        cells += `<button class="sc ${comet ? 'comet' : ''} ${start ? 'start' : ''} ${scratch.marks.includes(i) ? 'mark' : ''}" data-cell="${i}" aria-label="${cols[c]}${r + 1} : ${k ? STAR_LABEL[k].toLowerCase() : 'vide'}${comet ? ', la comète' : ''}${start ? ', départ de la lunette' : ''}">${starGlyph(k)}${comet ? '<i class="cmt"></i>' : ''}${start ? '<i class="startx"></i>' : ''}</button>`;
       }
     }
     return `<div class="skygrid" style="--n:${v.size}">${cells}</div>${starLegend()}
-      <p class="legend">La comète est cerclée de rouge. Touche une case pour y poser un repère, visible par toi seul.</p>`;
+      <p class="legend">La croix dorée : là où pointe la lunette au départ. Le cercle rouge : la comète. Touche une case pour y poser un repère, visible par toi seul.</p>`;
   }
 
   function scopeView(v, win) {
